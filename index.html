@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Virtual Pharmaceutics Lab Pro</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -67,19 +67,36 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
         
-        .math-box { font-size: 1.05em; line-height: 1.6; }
+        .math-box { font-size: 1.05em; line-height: 1.6; overflow-x: auto; overflow-y: hidden; }
         .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* Interactive Titration Fills */
+        .pink-endpoint-fill { fill: rgba(236, 72, 153, 0.6) !important; }
+        .brown-iodine-fill { fill: rgba(146, 64, 14, 0.9) !important; }
+        .clear-liquid-fill { fill: rgba(255, 255, 255, 0.15) !important; }
+
+        /* Mobile Sidebar Overlay */
+        #mobile-overlay { transition: opacity 0.3s ease; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200 h-screen flex overflow-hidden selection:bg-blue-500/30">
 
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" onclick="app.toggleSidebar(false)" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden backdrop-blur-sm opacity-0 pointer-events-none"></div>
+
     <!-- Sidebar Navigation -->
-    <aside class="w-80 bg-slate-900 flex flex-col shadow-2xl z-20 shrink-0 border-r border-slate-800">
-        <div class="p-6 bg-slate-950 text-white font-bold text-2xl flex items-center gap-4 border-b border-slate-800 tracking-tight">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <i class="fa-solid fa-microscope text-white text-xl"></i>
+    <aside id="sidebar" class="w-80 bg-slate-900 flex flex-col shadow-2xl z-50 shrink-0 border-r border-slate-800 fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out">
+        <div class="p-5 md:p-6 bg-slate-950 text-white font-bold text-xl md:text-2xl flex items-center justify-between border-b border-slate-800 tracking-tight">
+            <div class="flex items-center gap-3 md:gap-4">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                    <i class="fa-solid fa-microscope text-white text-base md:text-xl"></i>
+                </div>
+                <span>PharmaLab <span class="text-blue-500 font-light">Pro</span></span>
             </div>
-            <span>PharmaLab <span class="text-blue-500 font-light">Pro</span></span>
+            <!-- Close button for mobile -->
+            <button onclick="app.toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-2 focus:outline-none">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
         </div>
         
         <div class="px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-widest mt-2">Laboratory Modules</div>
@@ -120,42 +137,57 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col h-full relative bg-[#0B1121] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0B1121] to-black">
-        <header class="glass-panel p-6 z-10 flex justify-between items-start border-b-0 border-slate-800 shadow-xl">
-            <div>
-                <div class="flex items-center gap-3 mb-1">
-                    <span id="header-badge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">Lab 1</span>
-                    <h1 id="header-title" class="text-3xl font-bold text-white tracking-tight">Solubility Enhancements</h1>
+    <main class="flex-1 flex flex-col h-full relative bg-[#0B1121] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0B1121] to-black w-full overflow-hidden">
+        <header class="glass-panel p-4 md:p-6 z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-0 border-slate-800 shadow-xl w-full shrink-0">
+            <div class="flex items-start gap-3 w-full sm:w-auto">
+                <button onclick="app.toggleSidebar(true)" class="lg:hidden text-slate-300 hover:text-white mt-1.5 focus:outline-none shrink-0">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 md:gap-3 mb-1 flex-wrap">
+                        <span id="header-badge" class="px-2 py-0.5 rounded text-[10px] md:text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 whitespace-nowrap">Lab 1</span>
+                        <h1 id="header-title" class="text-xl md:text-3xl font-bold text-white tracking-tight truncate">Solubility Enhancements</h1>
+                    </div>
+                    <p id="header-subtitle" class="text-slate-400 text-xs md:text-sm max-w-2xl truncate sm:whitespace-normal line-clamp-1 sm:line-clamp-none">Explore three methods to increase solubility: Co-solvency, Salt Formation, and Complexation.</p>
                 </div>
-                <p id="header-subtitle" class="text-slate-400 text-sm max-w-2xl">Explore three methods to increase solubility: Co-solvency, Salt Formation, and Complexation.</p>
             </div>
-            <button onclick="app.resetCurrentLab()" class="px-4 py-2 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/50 text-slate-300 rounded-lg text-sm font-semibold transition-all border border-slate-700 flex items-center group">
-                <i class="fa-solid fa-rotate-right mr-2 group-hover:animate-spin"></i>Reset Experiment
+            <button onclick="app.resetCurrentLab()" class="px-3 md:px-4 py-2 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/50 text-slate-300 rounded-lg text-xs md:text-sm font-semibold transition-all border border-slate-700 flex items-center gap-2 group shrink-0 w-full sm:w-auto justify-center">
+                <i class="fa-solid fa-rotate-right group-hover:animate-spin"></i><span>Reset Experiment</span>
             </button>
         </header>
 
-        <div id="lab-container" class="flex-1 overflow-y-auto p-6 scroll-smooth z-0">
+        <div id="lab-container" class="flex-1 overflow-y-auto p-4 md:p-6 scroll-smooth z-0 w-full">
             <!-- Dynamic Content -->
         </div>
     </main>
 
     <!-- Quiz Modal -->
-    <div id="quiz-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] scale-in">
-            <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-                <h2 class="text-2xl font-bold text-white flex items-center gap-3"><i class="fa-solid fa-clipboard-question text-emerald-400"></i> Lab Assessment Notebook</h2>
-                <button onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <div id="quiz-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center p-3 md:p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[95vh] md:max-h-[90vh] scale-in">
+            <div class="p-4 md:p-6 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl shrink-0">
+                <h2 class="text-xl md:text-2xl font-bold text-white flex items-center gap-3"><i class="fa-solid fa-clipboard-question text-emerald-400"></i> <span class="truncate">Lab Assessment Notebook</span></h2>
+                <button onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="text-slate-400 hover:text-white transition-colors p-2"><i class="fa-solid fa-xmark text-xl md:text-2xl"></i></button>
             </div>
-            <div id="quiz-content" class="p-8 overflow-y-auto flex-1 space-y-8">
+            <div id="quiz-content" class="p-4 md:p-8 overflow-y-auto flex-1 space-y-6 md:space-y-8">
                 <!-- Quiz Injected Here -->
             </div>
         </div>
     </div>
 
+    <!-- Central SVG Resource Defs -->
+    <svg style="width:0;height:0;position:absolute;" aria-hidden="true" focusable="false">
+        <defs>
+            <clipPath id="universal-flask-clip">
+                <path d="M 40 5 L 60 5 L 60 45 L 90 105 C 95 115 85 120 80 120 L 20 120 C 15 120 5 115 10 105 L 40 45 Z" />
+            </clipPath>
+        </defs>
+    </svg>
+
     <script>
         const app = {
             currentLab: 'solubility',
             chartInstance: null,
+            sidebarOpen: false,
             
             state: {
                 solubility: { part: 1, step: 0, water: 10, alcohol: 0, maxAlcohol: 4, dissolved: false, saltStep: 0, complexStep: 0 },
@@ -174,6 +206,23 @@
 
             init() { setTimeout(() => this.renderLab(), 500); },
 
+            toggleSidebar(forceState) {
+                this.sidebarOpen = forceState !== undefined ? forceState : !this.sidebarOpen;
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobile-overlay');
+                
+                if (this.sidebarOpen) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                    overlay.classList.add('opacity-100');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.remove('opacity-100');
+                    overlay.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => { if(!this.sidebarOpen) overlay.classList.add('hidden'); }, 300);
+                }
+            },
+
             renderMath() {
                 if (window.renderMathInElement) {
                     renderMathInElement(document.getElementById('lab-container'), {
@@ -185,6 +234,11 @@
 
             switchLab(labId) {
                 this.currentLab = labId;
+                
+                // Close sidebar on mobile after selection
+                if (window.innerWidth < 1024) {
+                    this.toggleSidebar(false);
+                }
                 
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.classList.remove('bg-slate-800', 'text-white', 'border-slate-700', 'shadow-sm');
@@ -206,7 +260,7 @@
                 
                 const meta = titles[labId];
                 document.getElementById('header-badge').innerText = meta.badge;
-                document.getElementById('header-badge').className = `px-2.5 py-0.5 rounded text-xs font-bold bg-${meta.color}-500/20 text-${meta.color}-400 border border-${meta.color}-500/30`;
+                document.getElementById('header-badge').className = `px-2 md:px-2.5 py-0.5 rounded text-[10px] md:text-xs font-bold bg-${meta.color}-500/20 text-${meta.color}-400 border border-${meta.color}-500/30 whitespace-nowrap`;
                 document.getElementById('header-title').innerText = meta.t;
                 document.getElementById('header-subtitle').innerText = meta.s;
 
@@ -247,12 +301,10 @@
                 }, 100);
             },
 
-            // --- Robust Inline SVG Helper for Perfect Flasks ---
             getFlaskSVG(fillColor, yFill, extras = '') {
-                // Generate a unique ID to ensure multiple flasks on the same screen don't mix up clip paths
                 const clipId = 'flask-clip-' + Math.random().toString(36).substr(2, 9);
                 return `
-                <svg viewBox="0 0 100 120" class="absolute inset-0 w-full h-full z-0 overflow-visible drop-shadow-xl">
+                <svg viewBox="0 0 100 120" class="absolute inset-0 w-full h-full z-0 overflow-visible drop-shadow-xl max-w-full">
                     <defs>
                         <clipPath id="${clipId}">
                             <path d="M 40 5 L 60 5 L 60 45 L 90 105 C 95 115 85 120 80 120 L 20 120 C 15 120 5 115 10 105 L 40 45 Z" />
@@ -275,17 +327,17 @@
                     const percentAlcohol = totalVol > 0 ? ((s.alcohol / totalVol) * 100).toFixed(1) : 0;
                     
                     return `
-                    <div class="flex flex-col gap-6">
-                        <div class="flex gap-2 p-1 bg-slate-900 rounded-xl border border-slate-800 w-fit shadow-lg">
-                            <button onclick="app.state.solubility.part=1; app.renderLab();" class="px-6 py-2 rounded-lg font-semibold text-sm transition-all ${s.part===1 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">1. Co-solvency (Ethanol)</button>
-                            <button onclick="app.state.solubility.part=2; app.renderLab();" class="px-6 py-2 rounded-lg font-semibold text-sm transition-all ${s.part===2 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">2. Salt Formation (Na₂CO₃)</button>
-                            <button onclick="app.state.solubility.part=3; app.renderLab();" class="px-6 py-2 rounded-lg font-semibold text-sm transition-all ${s.part===3 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">3. Complexation (I₂ + KI)</button>
+                    <div class="flex flex-col gap-4 md:gap-6">
+                        <div class="flex flex-wrap gap-2 p-1 bg-slate-900 rounded-xl border border-slate-800 w-full md:w-fit shadow-lg">
+                            <button onclick="app.state.solubility.part=1; app.renderLab();" class="flex-1 md:flex-none px-4 md:px-6 py-2.5 md:py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${s.part===1 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">1. Co-solvency</button>
+                            <button onclick="app.state.solubility.part=2; app.renderLab();" class="flex-1 md:flex-none px-4 md:px-6 py-2.5 md:py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${s.part===2 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">2. Salt Formation</button>
+                            <button onclick="app.state.solubility.part=3; app.renderLab();" class="flex-1 md:flex-none px-4 md:px-6 py-2.5 md:py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${s.part===3 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">3. Complexation</button>
                         </div>
 
                         ${s.part === 1 ? `
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 fade-in">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 fade-in">
                             <div class="lg:col-span-4 space-y-4">
-                                <div class="glass-panel p-6 rounded-2xl h-full flex flex-col">
+                                <div class="glass-panel p-5 md:p-6 rounded-2xl h-full flex flex-col">
                                     <h3 class="font-bold text-lg mb-4 text-white border-b border-slate-700 pb-2"><i class="fa-solid fa-list-check text-blue-400 mr-2"></i>Procedure</h3>
                                     <ul class="space-y-4 text-sm text-slate-300 flex-1">
                                         <li class="${s.step >= 0 ? 'text-white font-semibold' : ''} flex gap-3"><div class="w-6 h-6 rounded-full ${s.step > 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400'} flex items-center justify-center shrink-0"><i class="fa-solid ${s.step > 0 ? 'fa-check text-xs' : 'fa-1 text-xs'}"></i></div> Place 0.1g Salicylic Acid.</li>
@@ -293,15 +345,15 @@
                                         <li class="${s.step >= 2 ? 'text-white font-semibold' : ''} flex gap-3"><div class="w-6 h-6 rounded-full ${s.step > 2 ? 'bg-emerald-500/20 text-emerald-400' : (s.step===2 ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-500')} flex items-center justify-center shrink-0"><i class="fa-solid ${s.step > 2 ? 'fa-check text-xs' : 'fa-3 text-xs'}"></i></div> Titrate with Alcohol to dissolve.</li>
                                     </ul>
                                     <div class="mt-6">
-                                        ${s.step === 0 ? `<button onclick="app.state.solubility.step=1; app.renderLab();" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all">Add 0.1g S.A & 10ml H₂O</button>` : ''}
-                                        ${s.step === 1 ? `<button onclick="app.state.solubility.step=2; app.renderLab();" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all">Prepare Burette</button>` : ''}
+                                        ${s.step === 0 ? `<button onclick="app.state.solubility.step=1; app.renderLab();" class="w-full py-3 md:py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all text-sm md:text-base">Add 0.1g S.A & 10ml H₂O</button>` : ''}
+                                        ${s.step === 1 ? `<button onclick="app.state.solubility.step=2; app.renderLab();" class="w-full py-3 md:py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all text-sm md:text-base">Prepare Burette</button>` : ''}
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="lg:col-span-4 bg-slate-900 rounded-2xl border border-slate-700 p-6 flex flex-col items-center justify-center min-h-[450px] relative overflow-hidden shadow-inner">
+                            <div class="lg:col-span-4 bg-slate-900 rounded-2xl border border-slate-700 p-4 md:p-6 flex flex-col items-center justify-center min-h-[350px] md:min-h-[450px] relative overflow-hidden shadow-inner">
                                 ${s.step >= 2 ? `
-                                <div class="absolute top-0 w-8 h-48 border-x-2 border-b-2 border-slate-400 bg-white/5 rounded-b z-10 flex flex-col justify-end">
+                                <div class="absolute top-0 w-8 h-36 md:h-48 border-x-2 border-b-2 border-slate-400 bg-white/5 rounded-b z-10 flex flex-col justify-end">
                                     <div class="w-full bg-blue-400/50 liquid-fill backdrop-blur-sm" style="height: ${100 - (s.alcohol*10)}%;"></div>
                                     <div class="absolute -bottom-3 -left-2 w-12 h-2 bg-slate-500 rounded"></div>
                                     <div class="absolute -bottom-6 left-1/2 -ml-1 w-2 h-4 bg-slate-400"></div>
@@ -309,7 +361,7 @@
                                 </div>
                                 ` : ''}
 
-                                <div class="relative w-36 h-44 mt-32 z-0">
+                                <div class="relative w-32 h-40 md:w-36 md:h-44 mt-24 md:mt-32 z-0">
                                     ${app.getFlaskSVG(
                                         s.step >= 1 ? "rgba(34,211,238,0.3)" : "transparent", 
                                         s.step >= 1 ? (120 - ((totalVol/20) * 80)) : 120,
@@ -324,19 +376,19 @@
                                 </div>
 
                                 ${s.step === 2 && !s.dissolved ? `
-                                    <button onmousedown="app.logic.solubility.titrate()" class="absolute bottom-8 px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-transform active:scale-95 z-20 flex items-center gap-2">
+                                    <button onmousedown="app.logic.solubility.titrate()" class="absolute bottom-4 md:bottom-8 px-5 py-2.5 md:px-6 md:py-3 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-transform active:scale-95 z-20 flex items-center gap-2 text-sm md:text-base">
                                         <i class="fa-solid fa-droplet"></i> Add 1ml Alcohol
                                     </button>
                                 ` : ''}
                                 ${s.dissolved && s.step === 2 ? `
-                                    <div class="absolute bottom-8 bg-emerald-500 text-white px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(16,185,129,0.5)] z-20 scale-in flex items-center gap-2">
-                                        <i class="fa-solid fa-check-circle"></i> S.A. Fully Dissolved!
+                                    <div class="absolute bottom-4 md:bottom-8 bg-emerald-500 text-white px-5 py-2.5 md:px-6 md:py-3 rounded-full font-bold shadow-[0_0_20px_rgba(16,185,129,0.5)] z-20 scale-in flex items-center gap-2 text-sm md:text-base">
+                                        <i class="fa-solid fa-check-circle"></i> Fully Dissolved!
                                     </div>
                                 `: ''}
                             </div>
 
                             <div class="lg:col-span-4 space-y-4">
-                                <div class="glass-panel p-6 rounded-2xl min-h-[450px]">
+                                <div class="glass-panel p-5 md:p-6 rounded-2xl min-h-[300px] md:min-h-[450px]">
                                     <h3 class="font-bold text-lg mb-4 text-white border-b border-slate-700 pb-2"><i class="fa-solid fa-calculator text-emerald-400 mr-2"></i>Analysis</h3>
                                     ${s.step >= 1 ? `
                                     <div class="math-box p-4 bg-slate-800/50 rounded-xl border border-slate-700 mb-4">
@@ -351,11 +403,11 @@
                                     </div>
                                     ` : ''}
                                     ${s.dissolved ? `
-                                    <div class="math-box p-5 bg-emerald-900/20 rounded-xl border border-emerald-800 fade-in">
+                                    <div class="math-box p-4 md:p-5 bg-emerald-900/20 rounded-xl border border-emerald-800 fade-in">
                                         <p class="text-sm text-emerald-400 font-bold mb-2">Dielectric Constant Adjusted!</p>
                                         <div>$\\text{\\% v/v} = \\left( \\frac{V_a}{V_t} \\right) \\times 100$</div>
-                                        <div class="my-3 text-lg font-bold text-white">$\\text{\\% v/v} = \\mathbf{${percentAlcohol}\\%}$</div>
-                                        <div class="text-sm text-slate-300 mt-4 border-t border-emerald-800/50 pt-3">
+                                        <div class="my-2 md:my-3 text-base md:text-lg font-bold text-white">$\\text{\\% v/v} = \\mathbf{${percentAlcohol}\\%}$</div>
+                                        <div class="text-xs md:text-sm text-slate-300 mt-3 md:mt-4 border-t border-emerald-800/50 pt-3">
                                             <strong>USP Expression:</strong><br>1 part of S.A. is soluble in 100 parts of ${percentAlcohol}% hydro-alcoholic solution.
                                         </div>
                                     </div>
@@ -366,9 +418,9 @@
                         ` : ''}
 
                         ${s.part === 2 ? `
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in">
-                            <div class="glass-panel p-6 rounded-2xl flex flex-col justify-center items-center min-h-[450px] relative overflow-hidden bg-slate-900 border border-slate-700">
-                                <div class="relative w-48 h-56 z-0">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 fade-in">
+                            <div class="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-center items-center min-h-[350px] md:min-h-[450px] relative overflow-hidden bg-slate-900 border border-slate-700">
+                                <div class="relative w-40 h-48 md:w-48 md:h-56 z-0">
                                     ${app.getFlaskSVG("rgba(34,211,238,0.2)", s.saltStep === 0 ? 80 : (s.saltStep === 1 ? 65 : 50), `
                                         ${s.saltStep === 1 ? `
                                             <circle cx="35" cy="110" r="2" fill="rgba(255,255,255,0.8)" class="svg-bubble" style="animation-delay: 0s" />
@@ -389,34 +441,34 @@
                                     `)}
                                 </div>
                                 
-                                <div class="absolute bottom-8 flex gap-4 z-20">
-                                    ${s.saltStep === 0 ? `<button onclick="app.state.solubility.saltStep=1; app.renderLab();" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95">Add 0.1g Na₂CO₃</button>` : ''}
-                                    ${s.saltStep === 1 ? `<button onclick="app.state.solubility.saltStep=2; app.renderLab();" class="px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95">Add 5ml HCl (10%)</button>` : ''}
-                                    ${s.saltStep === 2 ? `<button onclick="app.state.solubility.saltStep=0; app.renderLab();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95">Reset Salt Formation</button>` : ''}
+                                <div class="absolute bottom-6 md:bottom-8 flex flex-col sm:flex-row gap-2 md:gap-4 z-20 w-full px-4 sm:w-auto sm:px-0">
+                                    ${s.saltStep === 0 ? `<button onclick="app.state.solubility.saltStep=1; app.renderLab();" class="w-full sm:w-auto px-5 py-2.5 md:px-6 md:py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95 text-sm md:text-base">Add 0.1g Na₂CO₃</button>` : ''}
+                                    ${s.saltStep === 1 ? `<button onclick="app.state.solubility.saltStep=2; app.renderLab();" class="w-full sm:w-auto px-5 py-2.5 md:px-6 md:py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95 text-sm md:text-base">Add 5ml HCl (10%)</button>` : ''}
+                                    ${s.saltStep === 2 ? `<button onclick="app.state.solubility.saltStep=0; app.renderLab();" class="w-full sm:w-auto px-5 py-2.5 md:px-6 md:py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95 text-sm md:text-base">Reset Salt Formation</button>` : ''}
                                 </div>
                             </div>
                             
-                            <div class="glass-panel p-8 rounded-2xl flex flex-col justify-center">
-                                <h3 class="font-bold text-2xl mb-6 text-white border-b border-slate-700 pb-3"><i class="fa-solid fa-flask text-blue-400 mr-3"></i>Reaction Mechanisms</h3>
+                            <div class="glass-panel p-5 md:p-8 rounded-2xl flex flex-col justify-center">
+                                <h3 class="font-bold text-xl md:text-2xl mb-4 md:mb-6 text-white border-b border-slate-700 pb-3"><i class="fa-solid fa-flask text-blue-400 mr-3"></i>Reaction Mechanisms</h3>
                                 
-                                <div class="space-y-6 math-box">
-                                    <div class="p-5 rounded-xl border ${s.saltStep >= 0 ? 'bg-slate-800/80 border-slate-600' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all">
-                                        <div class="text-sm font-bold text-blue-400 mb-2 uppercase tracking-wide">Initial State</div>
-                                        <p class="text-slate-300">Salicylic Acid (weak acid) + $H_2O$ $\\rightarrow$ Insoluble</p>
+                                <div class="space-y-4 md:space-y-6 math-box">
+                                    <div class="p-4 md:p-5 rounded-xl border ${s.saltStep >= 0 ? 'bg-slate-800/80 border-slate-600' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all">
+                                        <div class="text-xs md:text-sm font-bold text-blue-400 mb-2 uppercase tracking-wide">Initial State</div>
+                                        <p class="text-sm md:text-base text-slate-300">Salicylic Acid + $H_2O$ $\\rightarrow$ Insoluble</p>
                                     </div>
                                     
-                                    <div class="p-5 rounded-xl border ${s.saltStep >= 1 ? 'bg-emerald-900/30 border-emerald-700/50' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all relative overflow-hidden">
-                                        ${s.saltStep === 1 ? '<div class="absolute top-0 right-0 bg-emerald-500 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">Fizzing! Soluble!</div>' : ''}
-                                        <div class="text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wide">Adding Na₂CO₃</div>
-                                        <div class="text-[1.1em] text-white">$\\text{2 HA} + \\text{Na}_2\\text{CO}_3 \\rightarrow \\text{2 NaA} + \\text{H}_2\\text{O} + \\text{CO}_2\\uparrow$</div>
-                                        <p class="text-slate-400 text-sm mt-3">S.A. reacts with the base to form <strong>Sodium Salicylate (NaA)</strong>, which is highly soluble in water due to ionization.</p>
+                                    <div class="p-4 md:p-5 rounded-xl border ${s.saltStep >= 1 ? 'bg-emerald-900/30 border-emerald-700/50' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all relative overflow-hidden">
+                                        ${s.saltStep === 1 ? '<div class="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] md:text-xs px-2 md:px-3 py-1 rounded-bl-lg font-bold">Fizzing! Soluble!</div>' : ''}
+                                        <div class="text-xs md:text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wide">Adding Na₂CO₃</div>
+                                        <div class="text-sm md:text-[1.1em] text-white">$\\text{2 HA} + \\text{Na}_2\\text{CO}_3 \\rightarrow \\text{2 NaA} + \\text{H}_2\\text{O} + \\text{CO}_2\\uparrow$</div>
+                                        <p class="text-slate-400 text-xs md:text-sm mt-2 md:mt-3">S.A. reacts with base to form <strong>Sodium Salicylate (NaA)</strong>, which is highly soluble due to ionization.</p>
                                     </div>
                                     
-                                    <div class="p-5 rounded-xl border ${s.saltStep >= 2 ? 'bg-rose-900/30 border-rose-700/50' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all relative overflow-hidden">
-                                        ${s.saltStep === 2 ? '<div class="absolute top-0 right-0 bg-rose-500 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">Precipitation!</div>' : ''}
-                                        <div class="text-sm font-bold text-rose-400 mb-2 uppercase tracking-wide">Adding Strong Acid (HCl)</div>
-                                        <div class="text-[1.1em] text-white">$\\text{NaA} + \\text{HCl} \\rightarrow \\text{HA}\\downarrow + \\text{NaCl}$</div>
-                                        <p class="text-slate-400 text-sm mt-3">HCl forces Sodium Salicylate back into unionized Salicylic Acid (HA). Since HA is insoluble, it precipitates out as a white solid.</p>
+                                    <div class="p-4 md:p-5 rounded-xl border ${s.saltStep >= 2 ? 'bg-rose-900/30 border-rose-700/50' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all relative overflow-hidden">
+                                        ${s.saltStep === 2 ? '<div class="absolute top-0 right-0 bg-rose-500 text-white text-[10px] md:text-xs px-2 md:px-3 py-1 rounded-bl-lg font-bold">Precipitation!</div>' : ''}
+                                        <div class="text-xs md:text-sm font-bold text-rose-400 mb-2 uppercase tracking-wide">Adding Strong Acid (HCl)</div>
+                                        <div class="text-sm md:text-[1.1em] text-white">$\\text{NaA} + \\text{HCl} \\rightarrow \\text{HA}\\downarrow + \\text{NaCl}$</div>
+                                        <p class="text-slate-400 text-xs md:text-sm mt-2 md:mt-3">HCl forces Sodium Salicylate back into unionized Salicylic Acid (HA) which precipitates out.</p>
                                     </div>
                                 </div>
                             </div>
@@ -424,9 +476,9 @@
                         ` : ''}
 
                         ${s.part === 3 ? `
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in">
-                            <div class="glass-panel p-6 rounded-2xl flex flex-col justify-center items-center min-h-[450px] relative overflow-hidden bg-slate-900 border border-slate-700">
-                                <div class="relative w-48 h-56 z-0">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 fade-in">
+                            <div class="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-center items-center min-h-[350px] md:min-h-[450px] relative overflow-hidden bg-slate-900 border border-slate-700">
+                                <div class="relative w-40 h-48 md:w-48 md:h-56 z-0">
                                     ${app.getFlaskSVG(s.complexStep === 0 ? "rgba(255, 255, 255, 0.15)" : "rgba(146, 64, 14, 0.9)", 70, `
                                         ${s.complexStep === 0 ? `
                                             <g>
@@ -438,28 +490,28 @@
                                     `)}
                                 </div>
                                 
-                                <div class="absolute bottom-8 flex gap-4 z-20">
-                                    ${s.complexStep === 0 ? `<button onclick="app.state.solubility.complexStep=1; app.renderLab();" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-full shadow-[0_0_15px_rgba(217,119,6,0.5)] transition-transform active:scale-95 flex items-center gap-2"><i class="fa-solid fa-vial"></i> Add 0.2g Potassium Iodide (KI)</button>` : ''}
-                                    ${s.complexStep === 1 ? `<button onclick="app.state.solubility.complexStep=0; app.renderLab();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95">Reset Complexation</button>` : ''}
+                                <div class="absolute bottom-6 md:bottom-8 flex flex-col sm:flex-row gap-2 md:gap-4 z-20 w-full px-4 sm:w-auto sm:px-0">
+                                    ${s.complexStep === 0 ? `<button onclick="app.state.solubility.complexStep=1; app.renderLab();" class="w-full sm:w-auto px-5 py-2.5 md:px-6 md:py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-full shadow-[0_0_15px_rgba(217,119,6,0.5)] transition-transform active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base"><i class="fa-solid fa-vial"></i> Add 0.2g KI</button>` : ''}
+                                    ${s.complexStep === 1 ? `<button onclick="app.state.solubility.complexStep=0; app.renderLab();" class="w-full sm:w-auto px-5 py-2.5 md:px-6 md:py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95 text-sm md:text-base">Reset Complexation</button>` : ''}
                                 </div>
                             </div>
                             
-                            <div class="glass-panel p-8 rounded-2xl flex flex-col justify-center">
-                                <h3 class="font-bold text-2xl mb-6 text-white border-b border-slate-700 pb-3"><i class="fa-solid fa-link text-amber-400 mr-3"></i>Complexation Chemistry</h3>
+                            <div class="glass-panel p-5 md:p-8 rounded-2xl flex flex-col justify-center">
+                                <h3 class="font-bold text-xl md:text-2xl mb-4 md:mb-6 text-white border-b border-slate-700 pb-3"><i class="fa-solid fa-link text-amber-400 mr-3"></i>Complexation Chemistry</h3>
                                 
-                                <div class="space-y-6 math-box">
-                                    <div class="p-5 rounded-xl border ${s.complexStep >= 0 ? 'bg-slate-800/80 border-slate-600' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all">
-                                        <div class="text-sm font-bold text-purple-400 mb-2 uppercase tracking-wide">Initial State</div>
-                                        <p class="text-slate-300">Iodine ($I_2$) is a non-polar molecule, practically insoluble in polar water. It remains as dark violet/black crystals at the bottom.</p>
+                                <div class="space-y-4 md:space-y-6 math-box">
+                                    <div class="p-4 md:p-5 rounded-xl border ${s.complexStep >= 0 ? 'bg-slate-800/80 border-slate-600' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all">
+                                        <div class="text-xs md:text-sm font-bold text-purple-400 mb-2 uppercase tracking-wide">Initial State</div>
+                                        <p class="text-sm md:text-base text-slate-300">Iodine ($I_2$) is a non-polar molecule, practically insoluble in polar water. Remains as dark crystals.</p>
                                     </div>
                                     
-                                    <div class="p-6 rounded-xl border ${s.complexStep >= 1 ? 'bg-amber-900/20 border-amber-700/50' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all relative overflow-hidden">
-                                        ${s.complexStep === 1 ? '<div class="absolute top-0 right-0 bg-amber-500 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">Soluble Complex!</div>' : ''}
-                                        <div class="text-sm font-bold text-amber-400 mb-3 uppercase tracking-wide">Adding Potassium Iodide (KI)</div>
-                                        <div class="text-[1.3em] text-white bg-black/30 p-4 rounded-lg text-center border border-amber-900/50 shadow-inner">
+                                    <div class="p-4 md:p-6 rounded-xl border ${s.complexStep >= 1 ? 'bg-amber-900/20 border-amber-700/50' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all relative overflow-hidden">
+                                        ${s.complexStep === 1 ? '<div class="absolute top-0 right-0 bg-amber-500 text-white text-[10px] md:text-xs px-2 md:px-3 py-1 rounded-bl-lg font-bold">Soluble Complex!</div>' : ''}
+                                        <div class="text-xs md:text-sm font-bold text-amber-400 mb-3 uppercase tracking-wide">Adding Potassium Iodide (KI)</div>
+                                        <div class="text-base md:text-[1.3em] text-white bg-black/30 p-3 md:p-4 rounded-lg text-center border border-amber-900/50 shadow-inner">
                                             $I_2 + KI \\rightleftharpoons KI_3$
                                         </div>
-                                        <p class="text-slate-400 text-sm mt-4">The iodide ion ($I^-$) from KI acts as a ligand, complexing with the $I_2$ molecule to form the highly soluble <strong>Tri-iodide complex ion ($I_3^-$)</strong>.</p>
+                                        <p class="text-slate-400 text-xs md:text-sm mt-3 md:mt-4">The iodide ion ($I^-$) acts as a ligand, complexing with $I_2$ to form the highly soluble <strong>Tri-iodide complex ion ($I_3^-$)</strong>.</p>
                                     </div>
                                 </div>
                             </div>
@@ -473,95 +525,94 @@
                     const flasks = [0, 1, 2, 3];
                     
                     return `
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
                         <div class="lg:col-span-4 space-y-4">
-                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
-                                <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3 flex items-center"><i class="fa-solid fa-list-check text-purple-400 mr-3"></i>Procedure Setup</h3>
-                                <div class="text-sm text-slate-300 space-y-3 mb-6 flex-1">
-                                    <p>Tri-sodium citrate (TSC) acts as a buffering agent (pH 7-9) and complexing agent to drastically increase aspirin solubility via H-bonding and dipole-dipole interactions.</p>
+                            <div class="glass-panel p-5 md:p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
+                                <h3 class="font-bold text-lg md:text-xl mb-4 text-white border-b border-slate-700 pb-2 md:pb-3 flex items-center"><i class="fa-solid fa-list-check text-purple-400 mr-2 md:mr-3"></i>Procedure Setup</h3>
+                                <div class="text-xs md:text-sm text-slate-300 space-y-3 mb-6 flex-1">
+                                    <p>Tri-sodium citrate (TSC) acts as a buffering agent and complexing agent to increase aspirin solubility.</p>
                                     <div class="bg-purple-900/20 border border-purple-800 p-3 rounded-lg text-purple-200">
-                                        <strong>Task:</strong> Select a flask containing 1g Aspirin and varying amounts of TSC. Titrate the filtrate with NaOH to determine the dissolved percentage.
+                                        <strong>Task:</strong> Select a flask containing 1g Aspirin and varying amounts of TSC. Titrate the filtrate with NaOH.
                                     </div>
                                 </div>
                                 
-                                <div class="grid grid-cols-2 gap-3 mt-auto">
+                                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2 md:gap-3 mt-auto">
                                     ${flasks.map(tsc => {
                                         const tested = s.data.find(d => d.tsc === tsc);
                                         const isActive = s.activeFlask === tsc;
                                         return `
-                                        <button onclick="app.logic.aspirin.selectFlask(${tsc})" class="p-3 border rounded-xl flex flex-col items-center justify-center gap-2 transition-all relative overflow-hidden ${isActive ? 'bg-purple-600 border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)] text-white' : (tested ? 'bg-slate-800 border-emerald-500/50 text-emerald-400' : 'bg-slate-900 border-slate-700 hover:border-purple-500 text-slate-400')}">
-                                            ${tested ? '<div class="absolute top-1 right-2 text-emerald-400 text-xs"><i class="fa-solid fa-check"></i></div>' : ''}
-                                            <i class="fa-solid fa-flask text-2xl mb-1 ${isActive ? 'text-white' : (tested ? 'text-emerald-500' : 'text-slate-500')}"></i>
-                                            <div class="text-xs font-bold text-center leading-tight">1g Aspirin<br><span class="${isActive?'text-purple-200':'text-purple-400'}">+ ${tsc}g TSC</span></div>
+                                        <button onclick="app.logic.aspirin.selectFlask(${tsc})" class="p-2 md:p-3 border rounded-xl flex flex-col items-center justify-center gap-1 md:gap-2 transition-all relative overflow-hidden ${isActive ? 'bg-purple-600 border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)] text-white' : (tested ? 'bg-slate-800 border-emerald-500/50 text-emerald-400' : 'bg-slate-900 border-slate-700 hover:border-purple-500 text-slate-400')}">
+                                            ${tested ? '<div class="absolute top-1 right-2 text-emerald-400 text-[10px] md:text-xs"><i class="fa-solid fa-check"></i></div>' : ''}
+                                            <i class="fa-solid fa-flask text-xl md:text-2xl mb-1 ${isActive ? 'text-white' : (tested ? 'text-emerald-500' : 'text-slate-500')}"></i>
+                                            <div class="text-[10px] md:text-xs font-bold text-center leading-tight">1g Aspirin<br><span class="${isActive?'text-purple-200':'text-purple-400'}">+ ${tsc}g TSC</span></div>
                                         </button>`
                                     }).join('')}
                                 </div>
                             </div>
                         </div>
 
-                        <div class="lg:col-span-8 glass-panel rounded-2xl shadow-xl border border-slate-700 flex flex-col relative overflow-hidden">
+                        <div class="lg:col-span-8 glass-panel rounded-2xl shadow-xl border border-slate-700 flex flex-col relative overflow-hidden min-h-[500px]">
                             ${s.activeFlask === null ? `
-                                <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-slate-900/80 z-10 backdrop-blur-sm">
-                                    <i class="fa-solid fa-hand-pointer text-4xl mb-4 text-purple-500/50 animate-bounce"></i>
-                                    <p class="text-lg font-medium">Select a flask from the left to begin titration.</p>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-slate-900/80 z-10 backdrop-blur-sm p-6 text-center">
+                                    <i class="fa-solid fa-hand-pointer text-3xl md:text-4xl mb-4 text-purple-500/50 animate-bounce"></i>
+                                    <p class="text-base md:text-lg font-medium">Select a flask from the left to begin titration.</p>
                                 </div>
                             ` : ''}
                             
-                            <div class="flex-1 flex p-6 gap-8">
-                                <div class="w-1/2 flex flex-col items-center justify-center relative border-r border-slate-700 pr-8">
+                            <div class="flex-1 flex flex-col md:flex-row p-4 md:p-6 gap-6 md:gap-8">
+                                <div class="w-full md:w-1/2 flex flex-col items-center justify-center relative md:border-r border-b md:border-b-0 border-slate-700 pb-6 md:pb-0 md:pr-8 min-h-[300px]">
                                     <!-- Burette -->
-                                    <div class="absolute top-4 w-10 h-64 border-x-2 border-b-2 border-slate-400 bg-white/5 rounded-b z-10 flex flex-col justify-end overflow-hidden">
-                                        <div class="absolute top-0 right-0 w-full h-full flex flex-col justify-between py-2 text-[8px] text-slate-500 font-mono text-right pr-1">
+                                    <div class="absolute top-0 md:top-4 w-8 md:w-10 h-48 md:h-64 border-x-2 border-b-2 border-slate-400 bg-white/5 rounded-b z-10 flex flex-col justify-end overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-full h-full flex flex-col justify-between py-2 text-[6px] md:text-[8px] text-slate-500 font-mono text-right pr-1">
                                             <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
                                         </div>
                                         <div id="burette-liquid" class="w-full bg-slate-200/40 liquid-fill" style="height: ${100 - (s.naohAdded*10)}%;"></div>
-                                        <div id="titration-drop" class="absolute -bottom-10 left-1/2 -ml-1 w-2 h-3 bg-slate-200 rounded-full anim-drop" style="display: ${s.titrating ? 'block' : 'none'};"></div>
+                                        <div id="titration-drop" class="absolute -bottom-6 md:-bottom-10 left-1/2 -ml-1 w-1.5 md:w-2 h-2.5 md:h-3 bg-slate-200 rounded-full anim-drop" style="display: ${s.titrating ? 'block' : 'none'};"></div>
                                     </div>
                                     <!-- Valve -->
-                                    <div class="absolute top-[260px] w-14 h-3 bg-slate-600 rounded z-20 shadow-lg"></div>
-                                    <div class="absolute top-[265px] w-3 h-6 bg-slate-500 z-10"></div>
+                                    <div class="absolute top-[185px] md:top-[260px] w-12 md:w-14 h-2 md:h-3 bg-slate-600 rounded z-20 shadow-lg"></div>
+                                    <div class="absolute top-[190px] md:top-[265px] w-2 md:w-3 h-4 md:h-6 bg-slate-500 z-10"></div>
 
                                     <!-- Flask -->
-                                    <div class="relative w-40 h-48 mt-56 z-0">
+                                    <div class="relative w-32 h-40 md:w-40 md:h-48 mt-48 md:mt-56 z-0">
                                         ${app.getFlaskSVG(s.endpoint === 1 ? "rgba(236, 72, 153, 0.6)" : "rgba(255, 255, 255, 0.15)", 70, `
-                                            <div class="absolute bottom-2 left-1/2 -ml-4 w-8 h-2 bg-white rounded-full anim-stir opacity-80 shadow-lg"></div>
+                                            <div class="absolute bottom-2 left-1/2 -ml-3 md:-ml-4 w-6 md:w-8 h-1.5 md:h-2 bg-white rounded-full anim-stir opacity-80 shadow-lg"></div>
                                         `)}
                                     </div>
                                 </div>
 
-                                <div class="w-1/2 flex flex-col">
-                                    <div class="bg-slate-900 border border-slate-700 p-5 rounded-xl mb-4">
+                                <div class="w-full md:w-1/2 flex flex-col">
+                                    <div class="bg-slate-900 border border-slate-700 p-4 md:p-5 rounded-xl mb-4">
                                         <div class="flex justify-between items-center mb-4">
-                                            <span class="text-sm font-bold text-slate-400 uppercase tracking-widest">Titration Control</span>
-                                            <span id="naoh-volume-text" class="font-mono text-xl font-bold text-purple-400 bg-purple-900/30 px-3 py-1 rounded border border-purple-800">${s.naohAdded.toFixed(1)} ml NaOH</span>
+                                            <span class="text-[10px] md:text-sm font-bold text-slate-400 uppercase tracking-widest">Titration Control</span>
+                                            <span id="naoh-volume-text" class="font-mono text-sm md:text-xl font-bold text-purple-400 bg-purple-900/30 px-2 py-1 md:px-3 rounded border border-purple-800">${s.naohAdded.toFixed(1)} ml NaOH</span>
                                         </div>
                                         
-                                        <!-- Clean DOM events block re-renders while holding mouse -->
                                         <button 
                                             onmousedown="app.logic.aspirin.startTitrate()" 
                                             onmouseup="app.logic.aspirin.stopTitrate()"
                                             onmouseleave="app.logic.aspirin.stopTitrate()"
                                             ontouchstart="app.logic.aspirin.startTitrate()"
                                             ontouchend="app.logic.aspirin.stopTitrate()"
-                                            class="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 ${s.endpoint === 1 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}">
+                                            class="w-full py-3 md:py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 md:gap-3 text-sm md:text-base ${s.endpoint === 1 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}">
                                             <i class="fa-solid fa-droplet"></i> HOLD TO ADD NaOH
                                         </button>
 
                                         ${s.endpoint === 1 ? `
-                                            <div class="mt-4 p-3 bg-emerald-900/30 border border-emerald-500/50 text-emerald-400 rounded-lg text-center font-bold text-sm scale-in">
+                                            <div class="mt-3 md:mt-4 p-2 md:p-3 bg-emerald-900/30 border border-emerald-500/50 text-emerald-400 rounded-lg text-center font-bold text-xs md:text-sm scale-in">
                                                 Endpoint Reached! (Pink Color)<br>
                                                 <span class="text-white font-mono mt-1 block">${app.constants.aspirinTitration[s.activeFlask].dissolved}% Dissolved</span>
                                             </div>
                                         ` : ''}
                                     </div>
 
-                                    <div class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-4 flex flex-col">
-                                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Solubility Curve</h4>
-                                        <div class="flex-1 relative min-h-[150px]">
+                                    <div class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 md:p-4 flex flex-col">
+                                        <h4 class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Solubility Curve</h4>
+                                        <div class="flex-1 relative min-h-[120px] md:min-h-[150px]">
                                             <canvas id="labChart"></canvas>
                                         </div>
                                         ${s.data.length === 4 ? `
-                                        <div class="mt-3 text-[11px] text-slate-400 bg-slate-800 p-2 rounded leading-tight border border-slate-700">
+                                        <div class="mt-2 md:mt-3 text-[9px] md:text-[11px] text-slate-400 bg-slate-800 p-2 rounded leading-tight border border-slate-700">
                                             <span class="text-rose-400 font-bold">Curve Drop Analysis:</span> At 3g TSC, excess dissociates into citrate and sodium ions. Common ion effect and buffering interference cause premature titration endpoint, lowering apparent solubility artificially.
                                         </div>` : ''}
                                     </div>
@@ -577,50 +628,50 @@
                     const isMeasuring = s.measuring;
                     
                     return `
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
                         <div class="lg:col-span-3 space-y-4">
-                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
-                                <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3"><i class="fa-solid fa-microscope text-cyan-400 mr-2"></i>Analysis Setup</h3>
-                                <p class="text-sm text-slate-400 mb-6">Select a Tween 60 concentration. The stalagmometer counts drops for a fixed volume to determine surface tension.</p>
+                            <div class="glass-panel p-5 md:p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
+                                <h3 class="font-bold text-lg md:text-xl mb-3 md:mb-4 text-white border-b border-slate-700 pb-2 md:pb-3"><i class="fa-solid fa-microscope text-cyan-400 mr-2"></i>Analysis Setup</h3>
+                                <p class="text-xs md:text-sm text-slate-400 mb-4 md:mb-6">Select a Tween 60 concentration. The stalagmometer counts drops for a fixed volume to determine surface tension.</p>
                                 
-                                <div class="space-y-4 flex-1">
-                                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Surfactant Concentration</label>
-                                    <select id="conc-select" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm font-medium text-white transition-all shadow-inner" onchange="app.state.surface.selectedConc = this.value; app.renderLab();" ${isMeasuring ? 'disabled':''}>
+                                <div class="space-y-3 md:space-y-4 flex-1">
+                                    <label class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">Surfactant Concentration</label>
+                                    <select id="conc-select" class="w-full p-2.5 md:p-3 bg-slate-900 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-xs md:text-sm font-medium text-white transition-all shadow-inner" onchange="app.state.surface.selectedConc = this.value; app.renderLab();" ${isMeasuring ? 'disabled':''}>
                                         <option value="" disabled ${!s.selectedConc ? 'selected' : ''}>-- Select Solution --</option>
                                         ${Object.keys(c).map(k => `<option value="${k}" ${s.selectedConc === k ? 'selected' : ''} ${s.data.find(d=>d.conc===k)?'disabled':''}>${k} Tween 60 ${s.data.find(d=>d.conc===k)?' (Measured)':''}</option>`).join('')}
                                     </select>
                                     
-                                    <button onclick="app.logic.surface.measure()" ${!s.selectedConc || isMeasuring || s.data.find(d=>d.conc===s.selectedConc) ? 'disabled' : ''} class="w-full py-4 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(8,145,178,0.3)] transition-all flex justify-center items-center gap-3">
-                                        ${isMeasuring ? '<i class="fa-solid fa-circle-notch fa-spin text-lg"></i> Counting...' : '<i class="fa-solid fa-play text-lg"></i> Start Stalagmometer'}
+                                    <button onclick="app.logic.surface.measure()" ${!s.selectedConc || isMeasuring || s.data.find(d=>d.conc===s.selectedConc) ? 'disabled' : ''} class="w-full py-3 md:py-4 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(8,145,178,0.3)] transition-all flex justify-center items-center gap-2 md:gap-3 text-sm md:text-base">
+                                        ${isMeasuring ? '<i class="fa-solid fa-circle-notch fa-spin"></i> Counting...' : '<i class="fa-solid fa-play"></i> Start Stalagmometer'}
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <div class="lg:col-span-4 space-y-4">
-                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 flex flex-col items-center justify-center min-h-[280px] relative ${isMeasuring ? 'measuring' : ''}">
-                                <div class="absolute top-4 right-4 bg-slate-900 text-cyan-400 font-mono text-2xl px-4 py-2 rounded-lg border border-cyan-500/30 shadow-[0_0_10px_rgba(8,145,178,0.2)]">
-                                    <span id="drop-counter">${isMeasuring ? '0' : (s.data.find(d=>d.conc===s.selectedConc)?.drops || '0')}</span><span class="text-xs text-slate-500 ml-1">drops</span>
+                            <div class="glass-panel p-5 md:p-6 rounded-2xl border border-slate-700 flex flex-col items-center justify-center min-h-[220px] md:min-h-[280px] relative ${isMeasuring ? 'measuring' : ''}">
+                                <div class="absolute top-3 right-3 md:top-4 md:right-4 bg-slate-900 text-cyan-400 font-mono text-lg md:text-2xl px-3 py-1.5 md:px-4 md:py-2 rounded-lg border border-cyan-500/30 shadow-[0_0_10px_rgba(8,145,178,0.2)]">
+                                    <span id="drop-counter">${isMeasuring ? '0' : (s.data.find(d=>d.conc===s.selectedConc)?.drops || '0')}</span><span class="text-[10px] md:text-xs text-slate-500 ml-1">drops</span>
                                 </div>
 
                                 <!-- Stalagmometer -->
-                                <div class="absolute top-0 w-8 h-36 border-x-2 border-slate-400 bg-white/5 opacity-80 z-10 rounded-b">
+                                <div class="absolute top-0 w-6 md:w-8 h-28 md:h-36 border-x-2 border-slate-400 bg-white/5 opacity-80 z-10 rounded-b">
                                     <div class="w-full bg-cyan-400/40 liquid-fill" style="height: ${isMeasuring ? '10%' : '90%'}"></div>
-                                    <div class="absolute -bottom-8 left-1/2 -ml-[3px] w-1.5 h-3 bg-cyan-400 rounded-full anim-drop shadow-[0_0_5px_cyan]"></div>
+                                    <div class="absolute -bottom-6 md:-bottom-8 left-1/2 -ml-[2px] md:-ml-[3px] w-1 md:w-1.5 h-2 md:h-3 bg-cyan-400 rounded-full anim-drop shadow-[0_0_5px_cyan]"></div>
                                 </div>
                                 
                                 <!-- Beaker -->
-                                <div class="absolute bottom-8 w-28 h-24 border-x-2 border-b-2 border-slate-400 rounded-b-xl z-0 flex flex-col justify-end overflow-hidden bg-slate-900/50">
+                                <div class="absolute bottom-4 md:bottom-8 w-20 h-16 md:w-28 md:h-24 border-x-2 border-b-2 border-slate-400 rounded-b-xl z-0 flex flex-col justify-end overflow-hidden bg-slate-900/50">
                                     <div class="w-full bg-cyan-400/30 liquid-fill backdrop-blur-sm" style="height: ${isMeasuring ? '80%' : '20%'}"></div>
                                 </div>
                             </div>
                             
-                            <div class="glass-panel p-5 rounded-2xl border border-slate-700 bg-slate-900 min-h-[160px] relative overflow-hidden">
-                                <h3 class="font-bold text-sm text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">Microscopic Behavior</h3>
-                                <div class="flex items-center gap-4">
-                                    <div class="w-16 h-16 relative shrink-0">
-                                        ${(!s.selectedConc || s.selectedConc === 'Water') ? '<div class="absolute inset-0 flex items-center justify-center text-slate-600 text-xs">No Surfactant</div>' : `
-                                            <div class="w-full h-full anim-micelle relative flex justify-center items-center">
+                            <div class="glass-panel p-4 md:p-5 rounded-2xl border border-slate-700 bg-slate-900 min-h-[140px] md:min-h-[160px] relative overflow-hidden">
+                                <h3 class="font-bold text-[10px] md:text-sm text-slate-400 uppercase tracking-widest mb-2 md:mb-3 border-b border-slate-800 pb-1 md:pb-2">Microscopic Behavior</h3>
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <div class="w-12 h-12 md:w-16 md:h-16 relative shrink-0">
+                                        ${(!s.selectedConc || s.selectedConc === 'Water') ? '<div class="absolute inset-0 flex items-center justify-center text-slate-600 text-[10px] md:text-xs text-center leading-tight">No Surfactant</div>' : `
+                                            <div class="w-full h-full anim-micelle relative flex justify-center items-center scale-75 md:scale-100">
                                                 <div class="absolute w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]" style="top:5px"></div><div class="absolute w-0.5 h-4 bg-slate-400" style="top:10px"></div>
                                                 <div class="absolute w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]" style="bottom:5px"></div><div class="absolute w-0.5 h-4 bg-slate-400" style="bottom:10px"></div>
                                                 <div class="absolute w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]" style="left:5px"></div><div class="absolute w-4 h-0.5 bg-slate-400" style="left:10px"></div>
@@ -628,7 +679,7 @@
                                             </div>
                                         `}
                                     </div>
-                                    <p class="text-xs text-slate-300 leading-relaxed">
+                                    <p class="text-[10px] md:text-xs text-slate-300 leading-relaxed">
                                         As concentration increases, surfactant molecules saturate the surface, lowering tension. At <strong>CMC</strong>, they form spherical <strong>micelles</strong> in the bulk liquid.
                                     </p>
                                 </div>
@@ -636,31 +687,31 @@
                         </div>
 
                         <div class="lg:col-span-5 space-y-4 flex flex-col">
-                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 flex-1 flex flex-col">
-                                <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3 flex items-center justify-between">
+                            <div class="glass-panel p-5 md:p-6 rounded-2xl border border-slate-700 flex-1 flex flex-col">
+                                <h3 class="font-bold text-lg md:text-xl mb-3 md:mb-4 text-white border-b border-slate-700 pb-2 md:pb-3 flex items-center justify-between">
                                     <span><i class="fa-solid fa-chart-line text-cyan-400 mr-2"></i>Surface Tension Plot</span>
                                 </h3>
-                                <div class="flex-1 relative min-h-[200px] bg-slate-900 rounded-xl p-2 border border-slate-800">
+                                <div class="flex-1 relative min-h-[180px] md:min-h-[200px] bg-slate-900 rounded-xl p-2 border border-slate-800">
                                     <canvas id="labChart"></canvas>
                                 </div>
                             </div>
 
-                            <div class="glass-panel p-5 rounded-2xl border border-slate-700 bg-slate-900">
-                                <div class="math-box text-sm space-y-3">
-                                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <div class="glass-panel p-4 md:p-5 rounded-2xl border border-slate-700 bg-slate-900">
+                                <div class="math-box text-xs md:text-sm space-y-3">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-2 gap-2">
                                         <span class="text-slate-400">Equation:</span>
-                                        <span class="bg-black/30 px-3 py-1 rounded-lg border border-slate-700 text-white">$\\gamma_2 = \\gamma_1 \\left(\\frac{d_2}{d_1}\\right) \\left(\\frac{n_1}{n_2}\\right)$</span>
+                                        <span class="bg-black/30 px-2 md:px-3 py-1 rounded-lg border border-slate-700 text-white self-start sm:self-auto">$\\gamma_2 = \\gamma_1 \\left(\\frac{d_2}{d_1}\\right) \\left(\\frac{n_1}{n_2}\\right)$</span>
                                     </div>
                                     ${s.data.length > 0 && !isMeasuring ? (() => {
                                         const last = s.data[s.data.length-1];
                                         if(last.conc === 'Water') return `<div class="text-center text-slate-500 italic py-2">Water reference recorded: $\\gamma_{w} = 72.8$</div>`;
                                         const w = c['Water'], t = c[last.conc];
                                         return `
-                                        <div class="bg-cyan-900/20 p-3 rounded-lg border border-cyan-800/50 scale-in">
-                                            <div class="mb-2 text-slate-300">$\\gamma_{${last.conc}} = 72.8 \\times \\left(\\frac{${t.density}}{${w.density}}\\right) \\times \\left(\\frac{${w.drops}}{${t.drops}}\\right)$</div>
-                                            <div class="text-lg font-bold text-cyan-400">$\\gamma = ${last.st.toFixed(2)} \\text{ dyne/cm}$</div>
+                                        <div class="bg-cyan-900/20 p-2.5 md:p-3 rounded-lg border border-cyan-800/50 scale-in">
+                                            <div class="mb-1 md:mb-2 text-slate-300 text-[10px] md:text-xs overflow-x-auto">$\\gamma_{${last.conc}} = 72.8 \\times \\left(\\frac{${t.density}}{${w.density}}\\right) \\times \\left(\\frac{${w.drops}}{${t.drops}}\\right)$</div>
+                                            <div class="text-base md:text-lg font-bold text-cyan-400">$\\gamma = ${last.st.toFixed(2)} \\text{ dyne/cm}$</div>
                                         </div>`;
-                                    })() : '<div class="text-center text-slate-600 italic py-4">Waiting for measurement...</div>'}
+                                    })() : '<div class="text-center text-slate-600 italic py-3 md:py-4">Waiting for measurement...</div>'}
                                 </div>
                             </div>
                         </div>
@@ -673,93 +724,93 @@
                     const isComplete = s.time >= 30;
                     
                     return `
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
                         <div class="lg:col-span-4 space-y-4">
-                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
-                                <h3 class="font-bold text-sm uppercase text-slate-500 mb-4 tracking-widest flex items-center justify-between">
-                                    Thermostatic Water Bath
-                                    <span class="bg-orange-500/20 text-orange-400 px-2 py-1 rounded border border-orange-500/30 text-xs font-mono">${s.temp}°C</span>
+                            <div class="glass-panel p-5 md:p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
+                                <h3 class="font-bold text-[10px] md:text-sm uppercase text-slate-500 mb-3 md:mb-4 tracking-widest flex items-center justify-between">
+                                    Water Bath
+                                    <span class="bg-orange-500/20 text-orange-400 px-2 py-0.5 md:py-1 rounded border border-orange-500/30 text-[10px] md:text-xs font-mono">${s.temp}°C</span>
                                 </h3>
                                 
-                                <div class="flex gap-2 mb-6">
+                                <div class="flex gap-2 mb-4 md:mb-6">
                                     ${temps.map(t => `
-                                        <button onclick="app.logic.kinetics.setTemp(${t})" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all border ${s.temp === t ? 'bg-orange-600 text-white border-orange-400 shadow-[0_0_15px_rgba(234,88,12,0.4)]' : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-white'}">${t}°C</button>
+                                        <button onclick="app.logic.kinetics.setTemp(${t})" class="flex-1 py-2 md:py-3 rounded-xl font-bold text-xs md:text-sm transition-all border ${s.temp === t ? 'bg-orange-600 text-white border-orange-400 shadow-[0_0_15px_rgba(234,88,12,0.4)]' : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-white'}">${t}°C</button>
                                     `).join('')}
                                 </div>
                                 
                                 <!-- Immersive Water Bath -->
-                                <div class="relative h-48 bg-slate-900 border-2 border-slate-600 rounded-xl overflow-hidden flex items-end justify-center mb-6 shadow-inner">
+                                <div class="relative h-40 md:h-48 bg-slate-900 border-2 border-slate-600 rounded-xl overflow-hidden flex items-end justify-center mb-4 md:mb-6 shadow-inner">
                                     <div class="absolute bottom-2 w-full flex justify-around opacity-80 z-20">
-                                        <div class="w-1/4 h-2 bg-gradient-to-r from-red-600 to-orange-500 rounded-full ${s.temp==70?'animate-pulse shadow-[0_0_10px_red]':''}"></div>
-                                        <div class="w-1/4 h-2 bg-gradient-to-r from-red-600 to-orange-500 rounded-full ${s.temp>=55?'animate-pulse shadow-[0_0_10px_red]':''}"></div>
+                                        <div class="w-1/4 h-1.5 md:h-2 bg-gradient-to-r from-red-600 to-orange-500 rounded-full ${s.temp==70?'animate-pulse shadow-[0_0_10px_red]':''}"></div>
+                                        <div class="w-1/4 h-1.5 md:h-2 bg-gradient-to-r from-red-600 to-orange-500 rounded-full ${s.temp>=55?'animate-pulse shadow-[0_0_10px_red]':''}"></div>
                                     </div>
                                     <div class="w-full bg-cyan-500/30 backdrop-blur-[2px] z-10" style="height: 35%;">
                                         ${s.temp > 45 ? `
-                                            <div class="bubble w-2 h-2 left-[20%] bottom-0" style="animation-duration: ${70/s.temp}s"></div>
-                                            <div class="bubble w-3 h-3 left-[50%] bottom-0" style="animation-duration: ${60/s.temp}s"></div>
-                                            <div class="bubble w-1.5 h-1.5 left-[80%] bottom-0" style="animation-duration: ${65/s.temp}s"></div>
+                                            <div class="bubble w-1.5 md:w-2 h-1.5 md:h-2 left-[20%] bottom-0" style="animation-duration: ${70/s.temp}s"></div>
+                                            <div class="bubble w-2 md:w-3 h-2 md:h-3 left-[50%] bottom-0" style="animation-duration: ${60/s.temp}s"></div>
+                                            <div class="bubble w-1 md:w-1.5 h-1 md:h-1.5 left-[80%] bottom-0" style="animation-duration: ${65/s.temp}s"></div>
                                         ` : ''}
                                     </div>
-                                    <div class="absolute bottom-6 w-20 h-24 z-0">
+                                    <div class="absolute bottom-4 md:bottom-6 w-16 h-20 md:w-20 md:h-24 z-0">
                                         ${app.getFlaskSVG("rgba(255,255,255,0.7)", 60)}
                                     </div>
                                 </div>
 
-                                <div class="flex items-center justify-between bg-black/40 text-white p-4 rounded-xl mb-4 border border-slate-800 shadow-inner">
-                                    <span class="font-bold text-slate-400 uppercase tracking-widest text-xs">Elapsed Time</span>
-                                    <span class="text-3xl font-bold font-mono text-orange-400 drop-shadow-[0_0_5px_rgba(251,146,60,0.5)]">${s.time} <span class="text-sm">min</span></span>
+                                <div class="flex items-center justify-between bg-black/40 text-white p-3 md:p-4 rounded-xl mb-3 md:mb-4 border border-slate-800 shadow-inner">
+                                    <span class="font-bold text-slate-400 uppercase tracking-widest text-[10px] md:text-xs">Elapsed Time</span>
+                                    <span class="text-2xl md:text-3xl font-bold font-mono text-orange-400 drop-shadow-[0_0_5px_rgba(251,146,60,0.5)]">${s.time} <span class="text-xs md:text-sm">min</span></span>
                                 </div>
                                 
-                                <button onclick="app.logic.kinetics.advanceTime()" ${isComplete || s.sampling ? 'disabled' : ''} class="mt-auto w-full py-4 bg-orange-600 hover:bg-orange-500 disabled:bg-slate-800 disabled:text-slate-600 disabled:border-slate-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(234,88,12,0.3)] transition-all flex justify-center items-center gap-2 border border-orange-500">
-                                    ${s.sampling ? '<i class="fa-solid fa-spinner fa-spin text-lg"></i> Processing Sample...' : (isComplete ? '<i class="fa-solid fa-flag-checkered text-lg"></i> Analysis Complete' : '<i class="fa-solid fa-forward-step text-lg"></i> Advance 10m & Sample')}
+                                <button onclick="app.logic.kinetics.advanceTime()" ${isComplete || s.sampling ? 'disabled' : ''} class="mt-auto w-full py-3 md:py-4 bg-orange-600 hover:bg-orange-500 disabled:bg-slate-800 disabled:text-slate-600 disabled:border-slate-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(234,88,12,0.3)] transition-all flex justify-center items-center gap-2 border border-orange-500 text-xs md:text-base">
+                                    ${s.sampling ? '<i class="fa-solid fa-spinner fa-spin"></i> Processing...' : (isComplete ? '<i class="fa-solid fa-flag-checkered"></i> Complete' : '<i class="fa-solid fa-forward-step"></i> Advance & Sample')}
                                 </button>
                             </div>
                         </div>
 
                         <div class="lg:col-span-3 space-y-4 flex flex-col">
-                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 flex-1 flex flex-col justify-between">
+                            <div class="glass-panel p-5 md:p-6 rounded-2xl border border-slate-700 flex-1 flex flex-col justify-between">
                                 <div>
-                                    <h3 class="font-bold text-sm text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2">First-Order Degradation</h3>
-                                    <div class="math-box text-sm space-y-4">
-                                        <div class="bg-black/30 p-3 rounded-xl border border-slate-700 shadow-inner text-center">
-                                            <div class="text-white text-lg">$\\log C = \\log C_0 - \\frac{k \\cdot t}{2.303}$</div>
+                                    <h3 class="font-bold text-[10px] md:text-sm text-slate-400 uppercase tracking-widest mb-3 md:mb-4 border-b border-slate-800 pb-1 md:pb-2">First-Order Degradation</h3>
+                                    <div class="math-box text-xs md:text-sm space-y-3 md:space-y-4">
+                                        <div class="bg-black/30 p-2 md:p-3 rounded-xl border border-slate-700 shadow-inner text-center overflow-x-auto">
+                                            <div class="text-white text-base md:text-lg">$\\log C = \\log C_0 - \\frac{k \\cdot t}{2.303}$</div>
                                         </div>
                                         
                                         ${s.time > 0 ? (() => {
                                             const d = s.data[s.temp].find(x => x.time === s.time);
                                             const k = app.constants.kineticsData[s.temp].k;
                                             return `
-                                            <div class="bg-orange-900/20 p-4 rounded-xl border border-orange-800/50 scale-in shadow-lg">
-                                                <div class="font-bold text-xs text-orange-500 mb-3 uppercase tracking-wider">State at $t = ${s.time}$ min:</div>
-                                                <div class="mb-2 text-slate-300">$\\log C = \\log(100) - \\frac{${k} \\times ${s.time}}{2.303}$</div>
-                                                <div class="font-bold text-orange-400 text-2xl mt-3 mb-1 bg-black/40 p-2 rounded text-center border border-orange-900/50">$\\log C = ${d.logC}$</div>
-                                                <div class="text-xs text-slate-400 text-center mt-2 border-t border-orange-900/50 pt-2">Active Aspirin Remaining: <strong class="text-white">${d.conc}%</strong></div>
+                                            <div class="bg-orange-900/20 p-3 md:p-4 rounded-xl border border-orange-800/50 scale-in shadow-lg">
+                                                <div class="font-bold text-[10px] md:text-xs text-orange-500 mb-2 md:mb-3 uppercase tracking-wider">State at $t = ${s.time}$ min:</div>
+                                                <div class="mb-1 md:mb-2 text-slate-300 text-[10px] md:text-xs overflow-x-auto">$\\log C = \\log(100) - \\frac{${k} \\times ${s.time}}{2.303}$</div>
+                                                <div class="font-bold text-orange-400 text-xl md:text-2xl mt-2 md:mt-3 mb-1 bg-black/40 p-1.5 md:p-2 rounded text-center border border-orange-900/50">$\\log C = ${d.logC}$</div>
+                                                <div class="text-[10px] md:text-xs text-slate-400 text-center mt-2 border-t border-orange-900/50 pt-2">Active Aspirin Remaining: <strong class="text-white">${d.conc}%</strong></div>
                                             </div>`;
-                                        })() : '<div class="text-slate-500 italic text-center mt-10">Advance timer to simulate degradation and view kinetic calculations.</div>'}
+                                        })() : '<div class="text-slate-500 italic text-center mt-6 md:mt-10 text-xs md:text-sm">Advance timer to simulate degradation and view kinetic calculations.</div>'}
                                     </div>
                                 </div>
 
-                                <div class="mt-6 border border-slate-700 rounded-xl p-3 bg-slate-900/50">
-                                    <div class="text-[10px] uppercase font-bold text-slate-500 mb-2 text-center">Molecular Breakdown</div>
-                                    <div class="flex items-center justify-center gap-2 text-xs text-slate-400 font-mono">
-                                        <span>Aspirin</span> <i class="fa-solid fa-plus text-[8px]"></i> <span>H₂O</span>
-                                        <i class="fa-solid fa-arrow-right text-orange-500"></i>
+                                <div class="mt-4 md:mt-6 border border-slate-700 rounded-xl p-2 md:p-3 bg-slate-900/50">
+                                    <div class="text-[8px] md:text-[10px] uppercase font-bold text-slate-500 mb-1 md:mb-2 text-center">Molecular Breakdown</div>
+                                    <div class="flex items-center justify-center gap-1 md:gap-2 text-[10px] md:text-xs text-slate-400 font-mono">
+                                        <span>Aspirin</span> <i class="fa-solid fa-plus text-[6px] md:text-[8px]"></i> <span>H₂O</span>
+                                        <i class="fa-solid fa-arrow-right text-orange-500 mx-1"></i>
                                         <div class="flex flex-col items-center leading-tight"><span>Salicylic</span><span>Acid</span></div>
-                                        <i class="fa-solid fa-plus text-[8px]"></i>
+                                        <i class="fa-solid fa-plus text-[6px] md:text-[8px]"></i>
                                         <div class="flex flex-col items-center leading-tight"><span>Acetic</span><span>Acid</span></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="lg:col-span-5 glass-panel rounded-2xl border border-slate-700 p-6 flex flex-col">
-                            <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3 flex items-center justify-between">
-                                <span><i class="fa-solid fa-chart-scatter text-orange-400 mr-2"></i>Arrhenius Plot Data (Log C vs Time)</span>
+                        <div class="lg:col-span-5 glass-panel rounded-2xl border border-slate-700 p-5 md:p-6 flex flex-col">
+                            <h3 class="font-bold text-lg md:text-xl mb-3 md:mb-4 text-white border-b border-slate-700 pb-2 md:pb-3 flex items-center justify-between">
+                                <span><i class="fa-solid fa-chart-scatter text-orange-400 mr-2"></i>Arrhenius Plot Data</span>
                             </h3>
-                            <div class="flex-1 relative min-h-[300px] bg-slate-900 rounded-xl p-2 border border-slate-800">
+                            <div class="flex-1 relative min-h-[220px] md:min-h-[300px] bg-slate-900 rounded-xl p-2 border border-slate-800">
                                 <canvas id="labChart"></canvas>
                             </div>
-                            <div class="mt-4 text-xs text-slate-400 bg-black/40 p-3 rounded-lg border border-slate-700 math-box">
+                            <div class="mt-3 md:mt-4 text-[10px] md:text-xs text-slate-400 bg-black/40 p-2 md:p-3 rounded-lg border border-slate-700 math-box">
                                 <strong class="text-orange-400">Rate Constant ($k$):</strong> The slope of each line equals $-k/2.303$. Higher temperatures produce a steeper negative slope, proving heat accelerates drug degradation (Shelf-life reduction).
                             </div>
                         </div>
@@ -772,36 +823,36 @@
                     const isMeasuring = s.measuring;
                     
                     return `
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
                         <div class="lg:col-span-3 space-y-4">
-                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
-                                <h3 class="font-bold text-sm uppercase text-slate-500 mb-4 tracking-widest border-b border-slate-800 pb-2">Capillary Viscometer</h3>
+                            <div class="glass-panel p-5 md:p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
+                                <h3 class="font-bold text-[10px] md:text-sm uppercase text-slate-500 mb-3 md:mb-4 tracking-widest border-b border-slate-800 pb-1 md:pb-2">Capillary Viscometer</h3>
                                 
-                                <div class="space-y-4 flex-1">
-                                    <select id="visc-conc-select" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm font-medium text-white shadow-inner transition-all" onchange="app.state.viscosity.conc = this.value; app.renderLab();" ${isMeasuring ? 'disabled':''}>
-                                        <option value="0" ${s.conc == 0 ? 'selected' : ''}>Water (Reference Base)</option>
+                                <div class="space-y-3 md:space-y-4 flex-1">
+                                    <select id="visc-conc-select" class="w-full p-2.5 md:p-3 bg-slate-900 border border-slate-600 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-xs md:text-sm font-medium text-white shadow-inner transition-all" onchange="app.state.viscosity.conc = this.value; app.renderLab();" ${isMeasuring ? 'disabled':''}>
+                                        <option value="0" ${s.conc == 0 ? 'selected' : ''}>Water (Reference)</option>
                                         ${concs.map(c => `<option value="${c}" ${s.conc == c ? 'selected' : ''} ${s.data.find(d=>d.c==c)?'disabled':''}>${c}% Gelatin Polymer ${s.data.find(d=>d.c==c)?' (Done)':''}</option>`).join('')}
                                     </select>
                                     
-                                    <button onclick="app.logic.viscosity.measure()" ${isMeasuring || s.data.find(d=>d.c==s.conc) ? 'disabled' : ''} class="w-full py-4 bg-amber-600 hover:bg-amber-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(217,119,6,0.3)] transition-all flex justify-center items-center gap-2 border border-amber-500">
-                                        ${isMeasuring ? '<i class="fa-solid fa-spinner fa-spin text-lg"></i> Fluid Flowing...' : '<i class="fa-solid fa-play text-lg"></i> Measure Flow Time'}
+                                    <button onclick="app.logic.viscosity.measure()" ${isMeasuring || s.data.find(d=>d.c==s.conc) ? 'disabled' : ''} class="w-full py-3 md:py-4 bg-amber-600 hover:bg-amber-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(217,119,6,0.3)] transition-all flex justify-center items-center gap-2 border border-amber-500 text-xs md:text-base">
+                                        ${isMeasuring ? '<i class="fa-solid fa-spinner fa-spin"></i> Fluid Flowing...' : '<i class="fa-solid fa-play"></i> Measure Flow Time'}
                                     </button>
                                 </div>
                                 
                                 ${s.data.length > 0 ? `
-                                <div class="mt-6 border-t border-slate-800 pt-4 scale-in">
-                                    <h4 class="font-bold text-xs text-slate-400 mb-3 uppercase tracking-widest">Experimental Data</h4>
-                                    <div class="bg-black/30 rounded-lg border border-slate-700 overflow-hidden">
-                                        <table class="w-full text-[11px] text-left text-slate-300 border-collapse">
+                                <div class="mt-4 md:mt-6 border-t border-slate-800 pt-3 md:pt-4 scale-in">
+                                    <h4 class="font-bold text-[10px] md:text-xs text-slate-400 mb-2 md:mb-3 uppercase tracking-widest">Experimental Data</h4>
+                                    <div class="bg-black/30 rounded-lg border border-slate-700 overflow-x-auto w-full">
+                                        <table class="w-full text-[10px] md:text-[11px] text-left text-slate-300 border-collapse min-w-[200px]">
                                             <thead class="bg-slate-800 text-slate-400 border-b border-slate-700">
-                                                <tr><th class="p-2 pl-3">Conc(%)</th><th class="p-2">t (sec)</th><th class="p-2 pr-3 text-right">$\\eta_{red}$</th></tr>
+                                                <tr><th class="p-1.5 md:p-2 pl-2 md:pl-3 whitespace-nowrap">Conc(%)</th><th class="p-1.5 md:p-2 whitespace-nowrap">t (sec)</th><th class="p-1.5 md:p-2 pr-2 md:pr-3 text-right">$\\eta_{red}$</th></tr>
                                             </thead>
                                             <tbody class="divide-y divide-slate-800/50">
                                                 ${[...s.data].sort((a,b)=>a.c-b.c).map(d => `
                                                     <tr class="hover:bg-slate-800/30 transition-colors">
-                                                        <td class="p-2 pl-3 font-semibold ${d.c==0?'text-cyan-400':''}">${d.c == 0 ? 'H₂O' : d.c}</td>
-                                                        <td class="p-2 font-mono">${d.t}s</td>
-                                                        <td class="p-2 pr-3 font-mono text-amber-400 text-right">${d.n_red ? d.n_red.toFixed(3) : '—'}</td>
+                                                        <td class="p-1.5 md:p-2 pl-2 md:pl-3 font-semibold ${d.c==0?'text-cyan-400':''}">${d.c == 0 ? 'H₂O' : d.c}</td>
+                                                        <td class="p-1.5 md:p-2 font-mono">${d.t}s</td>
+                                                        <td class="p-1.5 md:p-2 pr-2 md:pr-3 font-mono text-amber-400 text-right">${d.n_red ? d.n_red.toFixed(3) : '—'}</td>
                                                     </tr>
                                                 `).join('')}
                                             </tbody>
@@ -813,13 +864,13 @@
                         </div>
 
                         <div class="lg:col-span-4 space-y-4 flex flex-col">
-                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 bg-slate-900 flex flex-col items-center justify-center min-h-[260px] relative shadow-inner">
-                                <div class="absolute top-4 right-4 bg-black/80 text-amber-400 font-mono text-2xl px-4 py-2 rounded-lg border border-amber-500/30 shadow-[0_0_10px_rgba(217,119,6,0.2)] z-20">
-                                    <i class="fa-solid fa-stopwatch text-lg mr-2 opacity-50"></i><span id="visc-timer">${isMeasuring ? s.flowTimer.toFixed(1) : (s.data.find(d=>d.c==s.conc)?.t || '0.0')}</span><span class="text-sm ml-1">s</span>
+                            <div class="glass-panel p-4 md:p-6 rounded-2xl border border-slate-700 bg-slate-900 flex flex-col items-center justify-center min-h-[240px] md:min-h-[260px] relative shadow-inner">
+                                <div class="absolute top-3 right-3 md:top-4 md:right-4 bg-black/80 text-amber-400 font-mono text-xl md:text-2xl px-3 py-1.5 md:px-4 md:py-2 rounded-lg border border-amber-500/30 shadow-[0_0_10px_rgba(217,119,6,0.2)] z-20">
+                                    <i class="fa-solid fa-stopwatch text-base md:text-lg mr-1 md:mr-2 opacity-50"></i><span id="visc-timer">${isMeasuring ? s.flowTimer.toFixed(1) : (s.data.find(d=>d.c==s.conc)?.t || '0.0')}</span><span class="text-xs md:text-sm ml-1">s</span>
                                 </div>
 
                                 <!-- Correctly Shaped Custom SVG Ostwald Viscometer -->
-                                <div class="relative w-48 h-64 mt-4">
+                                <div class="relative w-40 h-56 md:w-48 md:h-64 mt-4">
                                     <svg viewBox="0 0 600 800" class="w-full h-full drop-shadow-xl" id="viscometer-svg">
                                         <defs>
                                             <clipPath id="visc-fluid-clip">
@@ -846,11 +897,9 @@
                                             <rect x="200" y="600" width="250" height="200" fill="rgba(6, 182, 212, 0.8)" />
                                             
                                             <!-- Left Measuring Bulb (Drains dynamically) -->
-                                            <!-- Moves down from Y=360 to Y=590 -->
                                             <rect id="visc-left-fluid" x="185" y="${isMeasuring ? '590' : (s.data.find(d=>d.c==s.conc) ? '590' : '360')}" width="100" height="400" fill="rgba(6, 182, 212, 0.8)" style="transition: y ${isMeasuring ? '2.5s' : '0.5s'} linear;" />
                                             
                                             <!-- Right Reservoir Bulb (Rises dynamically) -->
-                                            <!-- Moves up from Y=550 to Y=450 -->
                                             <rect id="visc-right-fluid" x="300" y="${isMeasuring ? '450' : (s.data.find(d=>d.c==s.conc) ? '450' : '550')}" width="150" height="400" fill="rgba(6, 182, 212, 0.8)" style="transition: y ${isMeasuring ? '2.5s' : '0.5s'} linear;" />
                                         </g>
 
@@ -864,36 +913,39 @@
                                 </div>
                             </div>
                             
-                            <div class="glass-panel p-5 rounded-2xl border border-slate-700 flex-1">
-                                <h3 class="font-bold text-sm text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">Mathematical Derivation</h3>
-                                <div class="math-box text-sm">
+                            <div class="glass-panel p-4 md:p-5 rounded-2xl border border-slate-700 flex-1">
+                                <h3 class="font-bold text-[10px] md:text-sm text-slate-400 uppercase tracking-widest mb-2 md:mb-3 border-b border-slate-800 pb-1 md:pb-2">Mathematical Derivation</h3>
+                                <div class="math-box text-xs md:text-sm">
                                     ${s.data.length > 0 && !isMeasuring ? (() => {
                                         const d = s.data[s.data.length-1];
-                                        if(d.c == 0) return `<div class="p-4 bg-cyan-900/20 border border-cyan-800/50 rounded-xl text-center text-cyan-200 scale-in"><i class="fa-solid fa-water block text-2xl mb-2 opacity-50"></i>Reference solvent flow time ($t_0$) successfully recorded: <br><strong class="text-xl font-mono text-cyan-400 mt-2 block">${d.t}s</strong></div>`;
+                                        if(d.c == 0) return `<div class="p-3 md:p-4 bg-cyan-900/20 border border-cyan-800/50 rounded-xl text-center text-cyan-200 scale-in"><i class="fa-solid fa-water block text-xl md:text-2xl mb-1 md:mb-2 opacity-50"></i>Reference solvent flow time ($t_0$) recorded: <br><strong class="text-lg md:text-xl font-mono text-cyan-400 mt-1 md:mt-2 block">${d.t}s</strong></div>`;
                                         
                                         const t0 = app.constants.viscosityData['0'].time;
                                         return `
-                                        <div class="bg-amber-900/20 p-4 rounded-xl border border-amber-800/50 scale-in text-[13px] space-y-3 shadow-lg">
-                                            <div class="flex justify-between items-center"><span class="text-slate-400">Relative ($\\eta_{rel}$)</span> <span class="text-white bg-black/30 px-2 py-1 rounded">$\\frac{${d.t}}{${t0}} = \\mathbf{${d.n_rel.toFixed(3)}}$</span></div>
-                                            <div class="flex justify-between items-center"><span class="text-slate-400">Specific ($\\eta_{sp}$)</span> <span class="text-white bg-black/30 px-2 py-1 rounded">${d.n_rel.toFixed(3)} - 1 = \\mathbf{${d.n_sp.toFixed(3)}}$</span></div>
-                                            <div class="flex justify-between items-center border-t border-amber-800/50 pt-2 mt-2"><span class="text-amber-500 font-bold">Reduced ($\\eta_{red}$)</span> <span class="text-amber-400 text-lg font-bold bg-black/50 px-2 py-1 rounded border border-amber-900">$\\frac{${d.n_sp.toFixed(3)}}{${d.c}} = \\mathbf{${d.n_red.toFixed(3)}}$</span></div>
+                                        <div class="bg-amber-900/20 p-3 md:p-4 rounded-xl border border-amber-800/50 scale-in text-[11px] md:text-[13px] space-y-2 md:space-y-3 shadow-lg">
+                                            <div class="flex justify-between items-center"><span class="text-slate-400">Relative ($\\eta_{rel}$)</span> <span class="text-white bg-black/30 px-1.5 md:px-2 py-0.5 md:py-1 rounded">$\\frac{${d.t}}{${t0}} = \\mathbf{${d.n_rel.toFixed(3)}}$</span></div>
+                                            <div class="flex justify-between items-center"><span class="text-slate-400">Specific ($\\eta_{sp}$)</span> <span class="text-white bg-black/30 px-1.5 md:px-2 py-0.5 md:py-1 rounded">${d.n_rel.toFixed(3)} - 1 = \\mathbf{${d.n_sp.toFixed(3)}}$</span></div>
+                                            <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center border-t border-amber-800/50 pt-2 mt-2 gap-2">
+                                                <span class="text-amber-500 font-bold">Reduced ($\\eta_{red}$)</span> 
+                                                <span class="text-amber-400 text-sm md:text-lg font-bold bg-black/50 px-2 py-1 rounded border border-amber-900 self-end sm:self-auto overflow-x-auto max-w-full">$\\frac{${d.n_sp.toFixed(3)}}{${d.c}} = \\mathbf{${d.n_red.toFixed(3)}}$</span>
+                                            </div>
                                         </div>`;
-                                    })() : '<div class="text-slate-500 italic text-center mt-8 text-xs bg-slate-900/50 p-4 rounded-lg border border-slate-800">System calculates $\\eta_{rel}$, $\\eta_{sp}$, and $\\eta_{red}$ sequentially upon measuring a polymer concentration.</div>'}
+                                    })() : '<div class="text-slate-500 italic text-center mt-4 md:mt-8 text-[10px] md:text-xs bg-slate-900/50 p-3 md:p-4 rounded-lg border border-slate-800">System calculates $\\eta_{rel}$, $\\eta_{sp}$, and $\\eta_{red}$ sequentially upon measuring a polymer concentration.</div>'}
                                 </div>
                             </div>
                         </div>
 
-                        <div class="lg:col-span-5 glass-panel rounded-2xl border border-slate-700 p-6 flex flex-col">
-                            <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3 flex items-center justify-between">
+                        <div class="lg:col-span-5 glass-panel rounded-2xl border border-slate-700 p-5 md:p-6 flex flex-col">
+                            <h3 class="font-bold text-lg md:text-xl mb-3 md:mb-4 text-white border-b border-slate-700 pb-2 md:pb-3 flex items-center justify-between">
                                 <span><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i>Intrinsic Viscosity Determination</span>
                             </h3>
-                            <div class="flex-1 relative min-h-[300px] bg-slate-900 rounded-xl p-2 border border-slate-800">
+                            <div class="flex-1 relative min-h-[200px] md:min-h-[300px] bg-slate-900 rounded-xl p-2 border border-slate-800">
                                 <canvas id="labChart"></canvas>
                             </div>
-                            <div class="mt-4 text-[13px] text-slate-300 bg-black/40 p-4 rounded-xl border border-slate-700 math-box shadow-inner">
-                                <span class="text-amber-400 font-bold uppercase text-xs tracking-wider block mb-1">Mark-Houwink Equation</span>
+                            <div class="mt-3 md:mt-4 text-[10px] md:text-[13px] text-slate-300 bg-black/40 p-3 md:p-4 rounded-xl border border-slate-700 math-box shadow-inner">
+                                <span class="text-amber-400 font-bold uppercase text-[9px] md:text-xs tracking-wider block mb-1">Mark-Houwink Equation</span>
                                 Extrapolate the line to the Y-axis (Concentration = 0) to find the <strong>Intrinsic Viscosity $[\\eta]$</strong>. Then calculate Molecular Weight ($M$) using:
-                                <div class="text-center text-white text-lg mt-2 bg-slate-800/50 py-1 rounded border border-slate-700"> $[\\eta] = KM^\\alpha$</div>
+                                <div class="text-center text-white text-sm md:text-lg mt-1 md:mt-2 bg-slate-800/50 py-1 rounded border border-slate-700"> $[\\eta] = KM^\\alpha$</div>
                             </div>
                         </div>
                     </div>`;
@@ -936,7 +988,6 @@
                         
                         s.titrating = true;
                         
-                        // Manipulate specific DOM elements to completely avoid render flickering
                         const dropAnim = document.getElementById('titration-drop');
                         if (dropAnim) dropAnim.style.display = 'block';
                         
@@ -955,9 +1006,8 @@
                                     });
                                     s.data.sort((a, b) => a.tsc - b.tsc);
                                 }
-                                app.renderLab(); // Only re-render once it reaches the endpoint
+                                app.renderLab(); 
                             } else {
-                                // Update elements without full DOM rebuild
                                 const numEl = document.getElementById('naoh-volume-text');
                                 if(numEl) numEl.innerText = `${s.naohAdded.toFixed(1)} ml NaOH`;
                                 const liqEl = document.getElementById('burette-liquid');
@@ -988,7 +1038,7 @@
                                     label: '% Aspirin Dissolved',
                                     data: data.map(d => d.dissolved),
                                     borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.2)',
-                                    borderWidth: 3, pointBackgroundColor: '#d8b4fe', pointRadius: 6, pointBorderColor: '#a855f7', pointBorderWidth: 2,
+                                    borderWidth: 3, pointBackgroundColor: '#d8b4fe', pointRadius: window.innerWidth < 768 ? 4 : 6, pointBorderColor: '#a855f7', pointBorderWidth: 2,
                                     fill: true, tension: 0.4
                                 }]
                             },
@@ -996,8 +1046,8 @@
                                 responsive: true, maintainAspectRatio: false,
                                 plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', bodyColor: '#d8b4fe', borderColor: '#7e22ce', borderWidth: 1 } },
                                 scales: {
-                                    y: { beginAtZero: true, max: 100, title: { display: true, text: '% Dissolved', color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                                    x: { title: { display: true, text: 'Tri-sodium Citrate (g)', color: '#cbd5e1' }, grid: { display: false } }
+                                    y: { beginAtZero: true, max: 100, title: { display: true, text: '% Dissolved', color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } },
+                                    x: { title: { display: true, text: 'Tri-sodium Citrate (g)', color: '#cbd5e1' }, grid: { display: false }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } }
                                 }
                             }
                         });
@@ -1065,7 +1115,7 @@
                                     label: 'Surface Tension',
                                     data: data.map(d => d.st),
                                     borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.1)',
-                                    borderWidth: 3, pointBackgroundColor: '#67e8f9', pointRadius: 6, pointBorderColor: '#06b6d4', pointBorderWidth: 2,
+                                    borderWidth: 3, pointBackgroundColor: '#67e8f9', pointRadius: window.innerWidth < 768 ? 4 : 6, pointBorderColor: '#06b6d4', pointBorderWidth: 2,
                                     tension: 0.1
                                 }]
                             },
@@ -1078,14 +1128,14 @@
                                             line1: {
                                                 type: 'line', xMin: cmcIndex, xMax: cmcIndex,
                                                 borderColor: 'rgba(236, 72, 153, 0.5)', borderWidth: 2, borderDash: [5, 5],
-                                                label: { content: 'CMC Region', display: true, position: 'start', backgroundColor: 'rgba(236, 72, 153, 0.8)' }
+                                                label: { content: 'CMC Region', display: true, position: 'start', backgroundColor: 'rgba(236, 72, 153, 0.8)', font: { size: window.innerWidth < 768 ? 10 : 12 } }
                                             }
                                         }
                                     } : {}
                                 },
                                 scales: {
-                                    y: { title: { display: true, text: 'Surface Tension (dyne/cm)', color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                                    x: { title: { display: true, text: 'Concentration (%)', color: '#cbd5e1' }, grid: { display: false } }
+                                    y: { title: { display: true, text: 'Surface Tension (dyne/cm)', color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } },
+                                    x: { title: { display: true, text: 'Concentration (%)', color: '#cbd5e1' }, grid: { display: false }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } }
                                 }
                             }
                         });
@@ -1135,7 +1185,7 @@
                                 label: `${t}°C`,
                                 data: s.data[t].map(d => ({ x: d.time, y: parseFloat(d.logC) })),
                                 borderColor: colors[idx], backgroundColor: bgColors[idx],
-                                showLine: true, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderWidth: 2, borderWidth: 3
+                                showLine: true, pointRadius: window.innerWidth < 768 ? 4 : 6, pointBackgroundColor: '#fff', pointBorderWidth: 2, borderWidth: 3
                             };
                         }).filter(ds => ds.data.length > 0);
 
@@ -1146,10 +1196,10 @@
                             data: { datasets },
                             options: {
                                 responsive: true, maintainAspectRatio: false,
-                                plugins: { legend: { position: 'top', labels: { color: '#fff', usePointStyle: true } } },
+                                plugins: { legend: { position: 'top', labels: { color: '#fff', usePointStyle: true, boxWidth: window.innerWidth < 768 ? 6 : 10, font: { size: window.innerWidth < 768 ? 10 : 12 } } } },
                                 scales: {
-                                    y: { title: { display: true, text: 'Log Concentration', color: '#cbd5e1' }, min: 1.0, max: 2.1, grid: { color: 'rgba(255,255,255,0.05)' } },
-                                    x: { title: { display: true, text: 'Time (min)', color: '#cbd5e1' }, min: 0, max: 35, ticks: { stepSize: 10 }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                                    y: { title: { display: true, text: 'Log Concentration', color: '#cbd5e1' }, min: 1.0, max: 2.1, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } },
+                                    x: { title: { display: true, text: 'Time (min)', color: '#cbd5e1' }, min: 0, max: 35, ticks: { stepSize: 10, font: { size: window.innerWidth < 768 ? 10 : 12 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
                                 }
                             }
                         });
@@ -1223,7 +1273,7 @@
                                     label: 'Reduced Viscosity',
                                     data: chartData.map(d => d.n_red),
                                     borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                    borderWidth: 3, pointBackgroundColor: (ctx) => ctx.dataIndex === 0 ? '#ef4444' : '#fcd34d', pointRadius: (ctx) => ctx.dataIndex === 0 ? 8 : 6, pointBorderColor: '#f59e0b', pointBorderWidth: 2,
+                                    borderWidth: 3, pointBackgroundColor: (ctx) => ctx.dataIndex === 0 ? '#ef4444' : '#fcd34d', pointRadius: (ctx) => ctx.dataIndex === 0 ? (window.innerWidth < 768 ? 6 : 8) : (window.innerWidth < 768 ? 4 : 6), pointBorderColor: '#f59e0b', pointBorderWidth: 2,
                                     segment: { borderDash: ctx => ctx.p0DataIndex === 0 ? [6, 6] : undefined }
                                 }]
                             },
@@ -1231,8 +1281,8 @@
                                 responsive: true, maintainAspectRatio: false,
                                 plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.dataIndex === 0 ? `Intrinsic Viscosity [η] = ${ctx.raw.toFixed(3)}` : `η_red = ${ctx.raw.toFixed(3)}` } } },
                                 scales: {
-                                    y: { title: { display: true, text: 'Reduced Viscosity (η_red)', color: '#cbd5e1' }, suggestedMin: intercept * 0.8, grid: { color: 'rgba(255,255,255,0.05)' } },
-                                    x: { title: { display: true, text: 'Concentration (w/v %)', color: '#cbd5e1' }, min: 0, grid: { display: false } }
+                                    y: { title: { display: true, text: 'Reduced Viscosity (η_red)', color: '#cbd5e1' }, suggestedMin: intercept * 0.8, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } },
+                                    x: { title: { display: true, text: 'Concentration (w/v %)', color: '#cbd5e1' }, min: 0, grid: { display: false }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } }
                                 }
                             }
                         });
@@ -1253,20 +1303,20 @@
                     { q: "How do we find the intrinsic viscosity from the reduced viscosity graph?", a: "By extrapolating the line to infinite dilution (Y-axis intercept where concentration = 0).", opts: ["By taking the highest value on the curve.", "By extrapolating the line to infinite dilution (Y-intercept where C=0).", "By calculating the area under the curve.", "By multiplying the slope by 100."] }
                 ];
 
-                let html = '<div class="space-y-6">';
+                let html = '<div class="space-y-4 md:space-y-6">';
                 questions.forEach((q, i) => {
                     html += `
-                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
-                        <p class="font-bold text-lg text-white mb-4"><span class="text-blue-500 mr-2">Q${i+1}.</span> ${q.q}</p>
-                        <div class="space-y-3 pl-6">
+                    <div class="bg-slate-800/50 p-4 md:p-6 rounded-xl border border-slate-700">
+                        <p class="font-bold text-sm md:text-lg text-white mb-3 md:mb-4"><span class="text-blue-500 mr-2">Q${i+1}.</span> ${q.q}</p>
+                        <div class="space-y-2 md:space-y-3 pl-2 md:pl-6">
                             ${q.opts.sort(()=>Math.random()-0.5).map((opt, j) => `
                                 <label class="flex items-start gap-3 cursor-pointer group">
-                                    <div class="mt-1 relative flex items-center justify-center">
+                                    <div class="mt-0.5 md:mt-1 relative flex items-center justify-center shrink-0">
                                         <input type="radio" name="q${i}" value="${opt === q.a ? 'correct' : 'wrong'}" class="peer sr-only" onchange="this.parentElement.parentElement.parentElement.querySelectorAll('label').forEach(l=>l.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-900/20', 'ring-rose-500', 'bg-rose-900/20')); if(this.value==='correct') { this.parentElement.parentElement.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-900/20'); } else { this.parentElement.parentElement.classList.add('ring-2', 'ring-rose-500', 'bg-rose-900/20'); }">
-                                        <div class="w-5 h-5 rounded-full border-2 border-slate-500 peer-checked:border-transparent bg-slate-900 transition-colors group-hover:border-blue-400"></div>
-                                        <div class="absolute w-2.5 h-2.5 rounded-full bg-blue-500 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                                        <div class="w-4 h-4 md:w-5 md:h-5 rounded-full border-2 border-slate-500 peer-checked:border-transparent bg-slate-900 transition-colors group-hover:border-blue-400"></div>
+                                        <div class="absolute w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-blue-500 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
                                     </div>
-                                    <span class="text-slate-300 group-hover:text-white transition-colors">${opt}</span>
+                                    <span class="text-xs md:text-sm text-slate-300 group-hover:text-white transition-colors leading-snug md:leading-normal">${opt}</span>
                                 </label>
                             `).join('')}
                         </div>
