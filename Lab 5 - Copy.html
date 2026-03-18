@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Pharmaceutics Lab Pro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        
+        /* Advanced Animations */
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .scale-in { animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        @keyframes dropFall { 
+            0% { transform: translateY(0) scale(1); opacity: 1; } 
+            70% { transform: translateY(50px) scale(1.1); opacity: 1; } 
+            100% { transform: translateY(60px) scale(0.2); opacity: 0; } 
+        }
+        .anim-drop { animation: dropFall 0.4s infinite linear; }
+
+        @keyframes svgBubbleRise {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-30px) scale(1.2); opacity: 0; }
+        }
+        .svg-bubble { animation: svgBubbleRise 1.5s infinite ease-in; transform-origin: center; }
+
+        @keyframes svgPrecipitateFall {
+            0% { transform: translateY(-40px); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(0px); opacity: 0.9; }
+        }
+        .svg-precipitate { animation: svgPrecipitateFall 2s forwards ease-out; }
+
+        @keyframes micelleSpin { 100% { transform: rotate(360deg); } }
+        .anim-micelle { animation: micelleSpin 10s infinite linear; }
+        
+        @keyframes stir {
+            0% { transform: translateX(-5px) rotate(-10deg); }
+            50% { transform: translateX(5px) rotate(10deg); }
+            100% { transform: translateX(-5px) rotate(-10deg); }
+        }
+        .anim-stir { animation: stir 0.5s infinite ease-in-out; }
+
+        /* Smooth Liquid Transitions */
+        .liquid-fill { transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .flask-liquid-fill { transition: y 0.6s cubic-bezier(0.4, 0, 0.2, 1), fill 1s ease; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        .math-box { font-size: 1.05em; line-height: 1.6; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 h-screen flex overflow-hidden selection:bg-blue-500/30">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-80 bg-slate-900 flex flex-col shadow-2xl z-20 shrink-0 border-r border-slate-800">
+        <div class="p-6 bg-slate-950 text-white font-bold text-2xl flex items-center gap-4 border-b border-slate-800 tracking-tight">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fa-solid fa-microscope text-white text-xl"></i>
+            </div>
+            <span>PharmaLab <span class="text-blue-500 font-light">Pro</span></span>
+        </div>
+        
+        <div class="px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-widest mt-2">Laboratory Modules</div>
+        
+        <nav class="flex-1 overflow-y-auto px-3 space-y-1 pb-6">
+            <button onclick="app.switchLab('solubility')" id="nav-solubility" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all bg-slate-800 text-white border border-slate-700 shadow-sm relative overflow-hidden group">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-droplet w-6 text-blue-400"></i> Lab 1: Solubility Methods</span>
+                <span class="text-xs text-slate-400 ml-9 mt-1">Co-Solvency, Salts & Complexation</span>
+            </button>
+            <button onclick="app.switchLab('aspirin')" id="nav-aspirin" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-capsules w-6 text-purple-400"></i> Lab 2: Aspirin Solubilization</span>
+                <span class="text-xs text-slate-500 ml-9 mt-1">Tri-sodium Citrate Titration</span>
+            </button>
+            <button onclick="app.switchLab('surface')" id="nav-surface" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-water w-6 text-cyan-400"></i> Lab 4: Surface Tension</span>
+                <span class="text-xs text-slate-500 ml-9 mt-1">Stalagmometer & Micelle Formation</span>
+            </button>
+            <button onclick="app.switchLab('kinetics')" id="nav-kinetics" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-stopwatch w-6 text-orange-400"></i> Lab 5: Reaction Kinetics</span>
+                <span class="text-xs text-slate-500 ml-9 mt-1">Aspirin Hydrolysis Tracking</span>
+            </button>
+            <button onclick="app.switchLab('viscosity')" id="nav-viscosity" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-hourglass-half w-6 text-amber-400"></i> Lab 6: Polymer Viscosity</span>
+                <span class="text-xs text-slate-500 ml-9 mt-1">Capillary Flow & Molecular Weight</span>
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+            <button onclick="app.openQuiz()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold rounded-lg shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-graduation-cap"></i> Final Lab Assessment
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-full relative bg-[#0B1121] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0B1121] to-black">
+        <header class="glass-panel p-6 z-10 flex justify-between items-start border-b-0 border-slate-800 shadow-xl">
+            <div>
+                <div class="flex items-center gap-3 mb-1">
+                    <span id="header-badge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">Lab 1</span>
+                    <h1 id="header-title" class="text-3xl font-bold text-white tracking-tight">Solubility Enhancements</h1>
+                </div>
+                <p id="header-subtitle" class="text-slate-400 text-sm max-w-2xl">Explore three methods to increase solubility: Co-solvency, Salt Formation, and Complexation.</p>
+            </div>
+            <button onclick="app.resetCurrentLab()" class="px-4 py-2 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/50 text-slate-300 rounded-lg text-sm font-semibold transition-all border border-slate-700 flex items-center group">
+                <i class="fa-solid fa-rotate-right mr-2 group-hover:animate-spin"></i>Reset Experiment
+            </button>
+        </header>
+
+        <div id="lab-container" class="flex-1 overflow-y-auto p-6 scroll-smooth z-0">
+            <!-- Dynamic Content -->
+        </div>
+    </main>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] scale-in">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3"><i class="fa-solid fa-clipboard-question text-emerald-400"></i> Lab Assessment Notebook</h2>
+                <button onclick="document.getElementById('quiz-modal').classList.add('hidden')" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="quiz-content" class="p-8 overflow-y-auto flex-1 space-y-8">
+                <!-- Quiz Injected Here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            currentLab: 'solubility',
+            chartInstance: null,
+            
+            state: {
+                solubility: { part: 1, step: 0, water: 10, alcohol: 0, maxAlcohol: 4, dissolved: false, saltStep: 0, complexStep: 0 },
+                aspirin: { step: 0, activeFlask: null, titrating: false, naohAdded: 0, endpoint: 0, data: [] },
+                surface: { step: 0, selectedConc: null, drops: 0, measuring: false, data: [] },
+                kinetics: { temp: 45, time: 0, sampling: false, data: {45:[], 55:[], 70:[]} },
+                viscosity: { conc: 0, measuring: false, flowTimer: 0, data: [] }
+            },
+
+            constants: {
+                surfaceData: { 'Water': { drops: 30, st: 72.8, density: 1.0 }, '0.01%': { drops: 35, density: 1.01 }, '0.03%': { drops: 42, density: 1.02 }, '0.05%': { drops: 48, density: 1.04 }, '0.075%': { drops: 54, density: 1.05 }, '0.1%': { drops: 60, density: 1.1 }, '0.2%': { drops: 61, density: 1.2 } },
+                viscosityData: { '0': { time: 10 }, '0.2': { time: 11.2 }, '0.4': { time: 12.5 }, '0.6': { time: 13.9 }, '0.8': { time: 15.4 } },
+                kineticsData: { 45: { k: 0.0105 }, 55: { k: 0.0223 }, 70: { k: 0.0510 } },
+                aspirinTitration: { 0: { expectedNaoh: 2.5, dissolved: 25 }, 1: { expectedNaoh: 5.0, dissolved: 50 }, 2: { expectedNaoh: 8.5, dissolved: 85 }, 3: { expectedNaoh: 8.0, dissolved: 80 } }
+            },
+
+            init() { setTimeout(() => this.renderLab(), 500); },
+
+            renderMath() {
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.getElementById('lab-container'), {
+                        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+                        throwOnError: false
+                    });
+                }
+            },
+
+            switchLab(labId) {
+                this.currentLab = labId;
+                
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('bg-slate-800', 'text-white', 'border-slate-700', 'shadow-sm');
+                    btn.classList.add('text-slate-400', 'border-transparent');
+                    btn.querySelector('div').classList.replace('bg-blue-500', 'bg-transparent');
+                });
+                const activeBtn = document.getElementById(`nav-${labId}`);
+                activeBtn.classList.remove('text-slate-400', 'border-transparent');
+                activeBtn.classList.add('bg-slate-800', 'text-white', 'border-slate-700', 'shadow-sm');
+                activeBtn.querySelector('div').classList.replace('bg-transparent', 'bg-blue-500');
+
+                const titles = {
+                    solubility: { badge: "Lab 1", color: "blue", t: "Solubility Enhancements", s: "Explore Co-solvency, Salt Formation, and Complexation techniques." },
+                    aspirin: { badge: "Lab 2", color: "purple", t: "Aspirin Complexation", s: "Perform a full titration to observe the effect of Tri-sodium Citrate." },
+                    surface: { badge: "Lab 4", color: "cyan", t: "Surface Tension & CMC", s: "Analyze surfactant behavior at the microscopic and macroscopic levels." },
+                    kinetics: { badge: "Lab 5", color: "orange", t: "Chemical Kinetics", s: "Track the molecular breakdown of Aspirin at different temperatures over time." },
+                    viscosity: { badge: "Lab 6", color: "amber", t: "Polymer Viscosity", s: "Determine the intrinsic viscosity and molecular weight of gelatin using capillary flow." }
+                };
+                
+                const meta = titles[labId];
+                document.getElementById('header-badge').innerText = meta.badge;
+                document.getElementById('header-badge').className = `px-2.5 py-0.5 rounded text-xs font-bold bg-${meta.color}-500/20 text-${meta.color}-400 border border-${meta.color}-500/30`;
+                document.getElementById('header-title').innerText = meta.t;
+                document.getElementById('header-subtitle').innerText = meta.s;
+
+                if (this.chartInstance) { this.chartInstance.destroy(); this.chartInstance = null; }
+                this.renderLab();
+            },
+
+            resetCurrentLab() {
+                switch(this.currentLab) {
+                    case 'solubility': this.state.solubility = { part: 1, step: 0, water: 10, alcohol: 0, maxAlcohol: 4, dissolved: false, saltStep: 0, complexStep: 0 }; break;
+                    case 'aspirin': this.state.aspirin = { step: 0, activeFlask: null, titrating: false, naohAdded: 0, endpoint: 0, data: [] }; break;
+                    case 'surface': this.state.surface = { step: 0, selectedConc: null, drops: 0, measuring: false, data: [] }; break;
+                    case 'kinetics': this.state.kinetics = { temp: 45, time: 0, sampling: false, data: {45:[], 55:[], 70:[]} }; break;
+                    case 'viscosity': this.state.viscosity = { conc: 0, measuring: false, flowTimer: 0, data: [] }; break;
+                }
+                if (this.chartInstance) { this.chartInstance.destroy(); this.chartInstance = null; }
+                this.renderLab();
+            },
+
+            renderLab() {
+                const container = document.getElementById('lab-container');
+                let content = '';
+                switch(this.currentLab) {
+                    case 'solubility': content = this.views.solubility(); break;
+                    case 'aspirin': content = this.views.aspirin(); break;
+                    case 'surface': content = this.views.surface(); break;
+                    case 'kinetics': content = this.views.kinetics(); break;
+                    case 'viscosity': content = this.views.viscosity(); break;
+                }
+                container.innerHTML = `<div class="fade-in max-w-7xl mx-auto">${content}</div>`;
+                this.renderMath();
+
+                setTimeout(() => {
+                    if(this.currentLab === 'aspirin') this.logic.aspirin.drawChart();
+                    if(this.currentLab === 'surface') this.logic.surface.drawChart();
+                    if(this.currentLab === 'kinetics') this.logic.kinetics.drawChart();
+                    if(this.currentLab === 'viscosity') this.logic.viscosity.drawChart();
+                }, 100);
+            },
+
+            // --- Robust Inline SVG Helper for Perfect Flasks ---
+            getFlaskSVG(fillColor, yFill, extras = '') {
+                // Generate a unique ID to ensure multiple flasks on the same screen don't mix up clip paths
+                const clipId = 'flask-clip-' + Math.random().toString(36).substr(2, 9);
+                return `
+                <svg viewBox="0 0 100 120" class="absolute inset-0 w-full h-full z-0 overflow-visible drop-shadow-xl">
+                    <defs>
+                        <clipPath id="${clipId}">
+                            <path d="M 40 5 L 60 5 L 60 45 L 90 105 C 95 115 85 120 80 120 L 20 120 C 15 120 5 115 10 105 L 40 45 Z" />
+                        </clipPath>
+                    </defs>
+                    <path d="M 40 5 L 60 5 L 60 45 L 90 105 C 95 115 85 120 80 120 L 20 120 C 15 120 5 115 10 105 L 40 45 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.4)" stroke-width="2" />
+                    <g clip-path="url(#${clipId})">
+                        <rect x="0" y="${yFill}" width="100" height="120" class="flask-liquid-fill" fill="${fillColor}" />
+                        ${extras}
+                    </g>
+                    <!-- Glass Rim -->
+                    <rect x="37" y="5" width="26" height="4" rx="2" fill="rgba(255,255,255,0.5)" />
+                </svg>`;
+            },
+
+            views: {
+                solubility() {
+                    const s = app.state.solubility;
+                    const totalVol = s.water + s.alcohol;
+                    const percentAlcohol = totalVol > 0 ? ((s.alcohol / totalVol) * 100).toFixed(1) : 0;
+                    
+                    return `
+                    <div class="flex flex-col gap-6">
+                        <div class="flex gap-2 p-1 bg-slate-900 rounded-xl border border-slate-800 w-fit shadow-lg">
+                            <button onclick="app.state.solubility.part=1; app.renderLab();" class="px-6 py-2 rounded-lg font-semibold text-sm transition-all ${s.part===1 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">1. Co-solvency (Ethanol)</button>
+                            <button onclick="app.state.solubility.part=2; app.renderLab();" class="px-6 py-2 rounded-lg font-semibold text-sm transition-all ${s.part===2 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">2. Salt Formation (Na₂CO₃)</button>
+                            <button onclick="app.state.solubility.part=3; app.renderLab();" class="px-6 py-2 rounded-lg font-semibold text-sm transition-all ${s.part===3 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}">3. Complexation (I₂ + KI)</button>
+                        </div>
+
+                        ${s.part === 1 ? `
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 fade-in">
+                            <div class="lg:col-span-4 space-y-4">
+                                <div class="glass-panel p-6 rounded-2xl h-full flex flex-col">
+                                    <h3 class="font-bold text-lg mb-4 text-white border-b border-slate-700 pb-2"><i class="fa-solid fa-list-check text-blue-400 mr-2"></i>Procedure</h3>
+                                    <ul class="space-y-4 text-sm text-slate-300 flex-1">
+                                        <li class="${s.step >= 0 ? 'text-white font-semibold' : ''} flex gap-3"><div class="w-6 h-6 rounded-full ${s.step > 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400'} flex items-center justify-center shrink-0"><i class="fa-solid ${s.step > 0 ? 'fa-check text-xs' : 'fa-1 text-xs'}"></i></div> Place 0.1g Salicylic Acid.</li>
+                                        <li class="${s.step >= 1 ? 'text-white font-semibold' : ''} flex gap-3"><div class="w-6 h-6 rounded-full ${s.step > 1 ? 'bg-emerald-500/20 text-emerald-400' : (s.step===1 ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-500')} flex items-center justify-center shrink-0"><i class="fa-solid ${s.step > 1 ? 'fa-check text-xs' : 'fa-2 text-xs'}"></i></div> Add 10ml H₂O. Notice insolubility.</li>
+                                        <li class="${s.step >= 2 ? 'text-white font-semibold' : ''} flex gap-3"><div class="w-6 h-6 rounded-full ${s.step > 2 ? 'bg-emerald-500/20 text-emerald-400' : (s.step===2 ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-500')} flex items-center justify-center shrink-0"><i class="fa-solid ${s.step > 2 ? 'fa-check text-xs' : 'fa-3 text-xs'}"></i></div> Titrate with Alcohol to dissolve.</li>
+                                    </ul>
+                                    <div class="mt-6">
+                                        ${s.step === 0 ? `<button onclick="app.state.solubility.step=1; app.renderLab();" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all">Add 0.1g S.A & 10ml H₂O</button>` : ''}
+                                        ${s.step === 1 ? `<button onclick="app.state.solubility.step=2; app.renderLab();" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all">Prepare Burette</button>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-4 bg-slate-900 rounded-2xl border border-slate-700 p-6 flex flex-col items-center justify-center min-h-[450px] relative overflow-hidden shadow-inner">
+                                ${s.step >= 2 ? `
+                                <div class="absolute top-0 w-8 h-48 border-x-2 border-b-2 border-slate-400 bg-white/5 rounded-b z-10 flex flex-col justify-end">
+                                    <div class="w-full bg-blue-400/50 liquid-fill backdrop-blur-sm" style="height: ${100 - (s.alcohol*10)}%;"></div>
+                                    <div class="absolute -bottom-3 -left-2 w-12 h-2 bg-slate-500 rounded"></div>
+                                    <div class="absolute -bottom-6 left-1/2 -ml-1 w-2 h-4 bg-slate-400"></div>
+                                    <div class="absolute -bottom-10 left-1/2 -ml-1 w-2 h-3 bg-blue-400 rounded-full anim-drop" style="display: ${s.measuring ? 'block' : 'none'};"></div>
+                                </div>
+                                ` : ''}
+
+                                <div class="relative w-36 h-44 mt-32 z-0">
+                                    ${app.getFlaskSVG(
+                                        s.step >= 1 ? "rgba(34,211,238,0.3)" : "transparent", 
+                                        s.step >= 1 ? (120 - ((totalVol/20) * 80)) : 120,
+                                        s.step >= 1 ? `
+                                            <g style="opacity: ${Math.max(0, 1 - (s.alcohol / s.maxAlcohol))}; transition: opacity 0.5s;">
+                                                <rect x="40" y="110" width="5" height="5" fill="white" transform="rotate(45 42 112)" />
+                                                <rect x="50" y="112" width="3" height="3" fill="white" />
+                                                <rect x="55" y="108" width="6" height="6" fill="white" transform="rotate(12 58 111)" />
+                                            </g>
+                                        ` : ''
+                                    )}
+                                </div>
+
+                                ${s.step === 2 && !s.dissolved ? `
+                                    <button onmousedown="app.logic.solubility.titrate()" class="absolute bottom-8 px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-transform active:scale-95 z-20 flex items-center gap-2">
+                                        <i class="fa-solid fa-droplet"></i> Add 1ml Alcohol
+                                    </button>
+                                ` : ''}
+                                ${s.dissolved && s.step === 2 ? `
+                                    <div class="absolute bottom-8 bg-emerald-500 text-white px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(16,185,129,0.5)] z-20 scale-in flex items-center gap-2">
+                                        <i class="fa-solid fa-check-circle"></i> S.A. Fully Dissolved!
+                                    </div>
+                                `: ''}
+                            </div>
+
+                            <div class="lg:col-span-4 space-y-4">
+                                <div class="glass-panel p-6 rounded-2xl min-h-[450px]">
+                                    <h3 class="font-bold text-lg mb-4 text-white border-b border-slate-700 pb-2"><i class="fa-solid fa-calculator text-emerald-400 mr-2"></i>Analysis</h3>
+                                    ${s.step >= 1 ? `
+                                    <div class="math-box p-4 bg-slate-800/50 rounded-xl border border-slate-700 mb-4">
+                                        <p class="text-sm text-slate-400 mb-1">Solvent ($V_w$): $10 \\text{ ml}$</p>
+                                        <p class="text-sm text-slate-400 mb-1">Solute ($m$): $0.1 \\text{ g}$</p>
+                                    </div>
+                                    ` : '<p class="text-sm text-slate-500 italic">Complete steps to see calculations.</p>'}
+                                    ${s.step >= 2 ? `
+                                    <div class="math-box p-4 bg-blue-900/20 rounded-xl border border-blue-800 mb-4">
+                                        <p class="text-sm text-slate-400 mb-1">Alcohol Added ($V_a$): <span class="text-blue-400 font-bold">${s.alcohol} ml</span></p>
+                                        <p class="text-sm text-slate-400">Total Vol ($V_t$): $10 + ${s.alcohol} = ${totalVol} \\text{ ml}$</p>
+                                    </div>
+                                    ` : ''}
+                                    ${s.dissolved ? `
+                                    <div class="math-box p-5 bg-emerald-900/20 rounded-xl border border-emerald-800 fade-in">
+                                        <p class="text-sm text-emerald-400 font-bold mb-2">Dielectric Constant Adjusted!</p>
+                                        <div>$\\text{\\% v/v} = \\left( \\frac{V_a}{V_t} \\right) \\times 100$</div>
+                                        <div class="my-3 text-lg font-bold text-white">$\\text{\\% v/v} = \\mathbf{${percentAlcohol}\\%}$</div>
+                                        <div class="text-sm text-slate-300 mt-4 border-t border-emerald-800/50 pt-3">
+                                            <strong>USP Expression:</strong><br>1 part of S.A. is soluble in 100 parts of ${percentAlcohol}% hydro-alcoholic solution.
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${s.part === 2 ? `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in">
+                            <div class="glass-panel p-6 rounded-2xl flex flex-col justify-center items-center min-h-[450px] relative overflow-hidden bg-slate-900 border border-slate-700">
+                                <div class="relative w-48 h-56 z-0">
+                                    ${app.getFlaskSVG("rgba(34,211,238,0.2)", s.saltStep === 0 ? 80 : (s.saltStep === 1 ? 65 : 50), `
+                                        ${s.saltStep === 1 ? `
+                                            <circle cx="35" cy="110" r="2" fill="rgba(255,255,255,0.8)" class="svg-bubble" style="animation-delay: 0s" />
+                                            <circle cx="50" cy="100" r="3" fill="rgba(255,255,255,0.8)" class="svg-bubble" style="animation-delay: 0.4s" />
+                                            <circle cx="65" cy="115" r="1.5" fill="rgba(255,255,255,0.8)" class="svg-bubble" style="animation-delay: 0.2s" />
+                                        ` : ''}
+                                        ${s.saltStep === 0 ? `
+                                            <rect x="45" y="112" width="6" height="6" fill="white" transform="rotate(25 48 115)" />
+                                            <rect x="55" y="115" width="4" height="4" fill="white" />
+                                        ` : ''}
+                                        ${s.saltStep === 2 ? `
+                                            <g class="svg-precipitate">
+                                                <rect x="40" y="110" width="8" height="8" fill="rgba(255,255,255,0.9)" transform="rotate(45 44 114)" />
+                                                <rect x="52" y="115" width="5" height="5" fill="rgba(255,255,255,0.9)" />
+                                                <rect x="60" y="108" width="7" height="7" fill="rgba(255,255,255,0.9)" transform="rotate(15 63 111)" />
+                                            </g>
+                                        ` : ''}
+                                    `)}
+                                </div>
+                                
+                                <div class="absolute bottom-8 flex gap-4 z-20">
+                                    ${s.saltStep === 0 ? `<button onclick="app.state.solubility.saltStep=1; app.renderLab();" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95">Add 0.1g Na₂CO₃</button>` : ''}
+                                    ${s.saltStep === 1 ? `<button onclick="app.state.solubility.saltStep=2; app.renderLab();" class="px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95">Add 5ml HCl (10%)</button>` : ''}
+                                    ${s.saltStep === 2 ? `<button onclick="app.state.solubility.saltStep=0; app.renderLab();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95">Reset Salt Formation</button>` : ''}
+                                </div>
+                            </div>
+                            
+                            <div class="glass-panel p-8 rounded-2xl flex flex-col justify-center">
+                                <h3 class="font-bold text-2xl mb-6 text-white border-b border-slate-700 pb-3"><i class="fa-solid fa-flask text-blue-400 mr-3"></i>Reaction Mechanisms</h3>
+                                
+                                <div class="space-y-6 math-box">
+                                    <div class="p-5 rounded-xl border ${s.saltStep >= 0 ? 'bg-slate-800/80 border-slate-600' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all">
+                                        <div class="text-sm font-bold text-blue-400 mb-2 uppercase tracking-wide">Initial State</div>
+                                        <p class="text-slate-300">Salicylic Acid (weak acid) + $H_2O$ $\\rightarrow$ Insoluble</p>
+                                    </div>
+                                    
+                                    <div class="p-5 rounded-xl border ${s.saltStep >= 1 ? 'bg-emerald-900/30 border-emerald-700/50' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all relative overflow-hidden">
+                                        ${s.saltStep === 1 ? '<div class="absolute top-0 right-0 bg-emerald-500 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">Fizzing! Soluble!</div>' : ''}
+                                        <div class="text-sm font-bold text-emerald-400 mb-2 uppercase tracking-wide">Adding Na₂CO₃</div>
+                                        <div class="text-[1.1em] text-white">$\\text{2 HA} + \\text{Na}_2\\text{CO}_3 \\rightarrow \\text{2 NaA} + \\text{H}_2\\text{O} + \\text{CO}_2\\uparrow$</div>
+                                        <p class="text-slate-400 text-sm mt-3">S.A. reacts with the base to form <strong>Sodium Salicylate (NaA)</strong>, which is highly soluble in water due to ionization.</p>
+                                    </div>
+                                    
+                                    <div class="p-5 rounded-xl border ${s.saltStep >= 2 ? 'bg-rose-900/30 border-rose-700/50' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all relative overflow-hidden">
+                                        ${s.saltStep === 2 ? '<div class="absolute top-0 right-0 bg-rose-500 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">Precipitation!</div>' : ''}
+                                        <div class="text-sm font-bold text-rose-400 mb-2 uppercase tracking-wide">Adding Strong Acid (HCl)</div>
+                                        <div class="text-[1.1em] text-white">$\\text{NaA} + \\text{HCl} \\rightarrow \\text{HA}\\downarrow + \\text{NaCl}$</div>
+                                        <p class="text-slate-400 text-sm mt-3">HCl forces Sodium Salicylate back into unionized Salicylic Acid (HA). Since HA is insoluble, it precipitates out as a white solid.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${s.part === 3 ? `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in">
+                            <div class="glass-panel p-6 rounded-2xl flex flex-col justify-center items-center min-h-[450px] relative overflow-hidden bg-slate-900 border border-slate-700">
+                                <div class="relative w-48 h-56 z-0">
+                                    ${app.getFlaskSVG(s.complexStep === 0 ? "rgba(255, 255, 255, 0.15)" : "rgba(146, 64, 14, 0.9)", 70, `
+                                        ${s.complexStep === 0 ? `
+                                            <g>
+                                                <rect x="40" y="112" width="8" height="6" fill="#1a0f2e" transform="rotate(15 44 115)" />
+                                                <rect x="52" y="114" width="5" height="5" fill="#2a1b42" />
+                                                <rect x="58" y="110" width="10" height="8" fill="#1a0f2e" transform="rotate(45 63 114)" />
+                                            </g>
+                                        ` : ''}
+                                    `)}
+                                </div>
+                                
+                                <div class="absolute bottom-8 flex gap-4 z-20">
+                                    ${s.complexStep === 0 ? `<button onclick="app.state.solubility.complexStep=1; app.renderLab();" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-full shadow-[0_0_15px_rgba(217,119,6,0.5)] transition-transform active:scale-95 flex items-center gap-2"><i class="fa-solid fa-vial"></i> Add 0.2g Potassium Iodide (KI)</button>` : ''}
+                                    ${s.complexStep === 1 ? `<button onclick="app.state.solubility.complexStep=0; app.renderLab();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-full shadow-lg transition-transform active:scale-95">Reset Complexation</button>` : ''}
+                                </div>
+                            </div>
+                            
+                            <div class="glass-panel p-8 rounded-2xl flex flex-col justify-center">
+                                <h3 class="font-bold text-2xl mb-6 text-white border-b border-slate-700 pb-3"><i class="fa-solid fa-link text-amber-400 mr-3"></i>Complexation Chemistry</h3>
+                                
+                                <div class="space-y-6 math-box">
+                                    <div class="p-5 rounded-xl border ${s.complexStep >= 0 ? 'bg-slate-800/80 border-slate-600' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all">
+                                        <div class="text-sm font-bold text-purple-400 mb-2 uppercase tracking-wide">Initial State</div>
+                                        <p class="text-slate-300">Iodine ($I_2$) is a non-polar molecule, practically insoluble in polar water. It remains as dark violet/black crystals at the bottom.</p>
+                                    </div>
+                                    
+                                    <div class="p-6 rounded-xl border ${s.complexStep >= 1 ? 'bg-amber-900/20 border-amber-700/50' : 'bg-slate-900/50 border-slate-800 opacity-50'} transition-all relative overflow-hidden">
+                                        ${s.complexStep === 1 ? '<div class="absolute top-0 right-0 bg-amber-500 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">Soluble Complex!</div>' : ''}
+                                        <div class="text-sm font-bold text-amber-400 mb-3 uppercase tracking-wide">Adding Potassium Iodide (KI)</div>
+                                        <div class="text-[1.3em] text-white bg-black/30 p-4 rounded-lg text-center border border-amber-900/50 shadow-inner">
+                                            $I_2 + KI \\rightleftharpoons KI_3$
+                                        </div>
+                                        <p class="text-slate-400 text-sm mt-4">The iodide ion ($I^-$) from KI acts as a ligand, complexing with the $I_2$ molecule to form the highly soluble <strong>Tri-iodide complex ion ($I_3^-$)</strong>.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>`;
+                },
+
+                aspirin() {
+                    const s = app.state.aspirin;
+                    const flasks = [0, 1, 2, 3];
+                    
+                    return `
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-4 space-y-4">
+                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
+                                <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3 flex items-center"><i class="fa-solid fa-list-check text-purple-400 mr-3"></i>Procedure Setup</h3>
+                                <div class="text-sm text-slate-300 space-y-3 mb-6 flex-1">
+                                    <p>Tri-sodium citrate (TSC) acts as a buffering agent (pH 7-9) and complexing agent to drastically increase aspirin solubility via H-bonding and dipole-dipole interactions.</p>
+                                    <div class="bg-purple-900/20 border border-purple-800 p-3 rounded-lg text-purple-200">
+                                        <strong>Task:</strong> Select a flask containing 1g Aspirin and varying amounts of TSC. Titrate the filtrate with NaOH to determine the dissolved percentage.
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-3 mt-auto">
+                                    ${flasks.map(tsc => {
+                                        const tested = s.data.find(d => d.tsc === tsc);
+                                        const isActive = s.activeFlask === tsc;
+                                        return `
+                                        <button onclick="app.logic.aspirin.selectFlask(${tsc})" class="p-3 border rounded-xl flex flex-col items-center justify-center gap-2 transition-all relative overflow-hidden ${isActive ? 'bg-purple-600 border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)] text-white' : (tested ? 'bg-slate-800 border-emerald-500/50 text-emerald-400' : 'bg-slate-900 border-slate-700 hover:border-purple-500 text-slate-400')}">
+                                            ${tested ? '<div class="absolute top-1 right-2 text-emerald-400 text-xs"><i class="fa-solid fa-check"></i></div>' : ''}
+                                            <i class="fa-solid fa-flask text-2xl mb-1 ${isActive ? 'text-white' : (tested ? 'text-emerald-500' : 'text-slate-500')}"></i>
+                                            <div class="text-xs font-bold text-center leading-tight">1g Aspirin<br><span class="${isActive?'text-purple-200':'text-purple-400'}">+ ${tsc}g TSC</span></div>
+                                        </button>`
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-8 glass-panel rounded-2xl shadow-xl border border-slate-700 flex flex-col relative overflow-hidden">
+                            ${s.activeFlask === null ? `
+                                <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-slate-900/80 z-10 backdrop-blur-sm">
+                                    <i class="fa-solid fa-hand-pointer text-4xl mb-4 text-purple-500/50 animate-bounce"></i>
+                                    <p class="text-lg font-medium">Select a flask from the left to begin titration.</p>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="flex-1 flex p-6 gap-8">
+                                <div class="w-1/2 flex flex-col items-center justify-center relative border-r border-slate-700 pr-8">
+                                    <!-- Burette -->
+                                    <div class="absolute top-4 w-10 h-64 border-x-2 border-b-2 border-slate-400 bg-white/5 rounded-b z-10 flex flex-col justify-end overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-full h-full flex flex-col justify-between py-2 text-[8px] text-slate-500 font-mono text-right pr-1">
+                                            <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+                                        </div>
+                                        <div id="burette-liquid" class="w-full bg-slate-200/40 liquid-fill" style="height: ${100 - (s.naohAdded*10)}%;"></div>
+                                        <div id="titration-drop" class="absolute -bottom-10 left-1/2 -ml-1 w-2 h-3 bg-slate-200 rounded-full anim-drop" style="display: ${s.titrating ? 'block' : 'none'};"></div>
+                                    </div>
+                                    <!-- Valve -->
+                                    <div class="absolute top-[260px] w-14 h-3 bg-slate-600 rounded z-20 shadow-lg"></div>
+                                    <div class="absolute top-[265px] w-3 h-6 bg-slate-500 z-10"></div>
+
+                                    <!-- Flask -->
+                                    <div class="relative w-40 h-48 mt-56 z-0">
+                                        ${app.getFlaskSVG(s.endpoint === 1 ? "rgba(236, 72, 153, 0.6)" : "rgba(255, 255, 255, 0.15)", 70, `
+                                            <div class="absolute bottom-2 left-1/2 -ml-4 w-8 h-2 bg-white rounded-full anim-stir opacity-80 shadow-lg"></div>
+                                        `)}
+                                    </div>
+                                </div>
+
+                                <div class="w-1/2 flex flex-col">
+                                    <div class="bg-slate-900 border border-slate-700 p-5 rounded-xl mb-4">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <span class="text-sm font-bold text-slate-400 uppercase tracking-widest">Titration Control</span>
+                                            <span id="naoh-volume-text" class="font-mono text-xl font-bold text-purple-400 bg-purple-900/30 px-3 py-1 rounded border border-purple-800">${s.naohAdded.toFixed(1)} ml NaOH</span>
+                                        </div>
+                                        
+                                        <!-- Clean DOM events block re-renders while holding mouse -->
+                                        <button 
+                                            onmousedown="app.logic.aspirin.startTitrate()" 
+                                            onmouseup="app.logic.aspirin.stopTitrate()"
+                                            onmouseleave="app.logic.aspirin.stopTitrate()"
+                                            ontouchstart="app.logic.aspirin.startTitrate()"
+                                            ontouchend="app.logic.aspirin.stopTitrate()"
+                                            class="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 ${s.endpoint === 1 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}">
+                                            <i class="fa-solid fa-droplet"></i> HOLD TO ADD NaOH
+                                        </button>
+
+                                        ${s.endpoint === 1 ? `
+                                            <div class="mt-4 p-3 bg-emerald-900/30 border border-emerald-500/50 text-emerald-400 rounded-lg text-center font-bold text-sm scale-in">
+                                                Endpoint Reached! (Pink Color)<br>
+                                                <span class="text-white font-mono mt-1 block">${app.constants.aspirinTitration[s.activeFlask].dissolved}% Dissolved</span>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+
+                                    <div class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-4 flex flex-col">
+                                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Solubility Curve</h4>
+                                        <div class="flex-1 relative min-h-[150px]">
+                                            <canvas id="labChart"></canvas>
+                                        </div>
+                                        ${s.data.length === 4 ? `
+                                        <div class="mt-3 text-[11px] text-slate-400 bg-slate-800 p-2 rounded leading-tight border border-slate-700">
+                                            <span class="text-rose-400 font-bold">Curve Drop Analysis:</span> At 3g TSC, excess dissociates into citrate and sodium ions. Common ion effect and buffering interference cause premature titration endpoint, lowering apparent solubility artificially.
+                                        </div>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                },
+
+                surface() {
+                    const s = app.state.surface;
+                    const c = app.constants.surfaceData;
+                    const isMeasuring = s.measuring;
+                    
+                    return `
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-3 space-y-4">
+                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
+                                <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3"><i class="fa-solid fa-microscope text-cyan-400 mr-2"></i>Analysis Setup</h3>
+                                <p class="text-sm text-slate-400 mb-6">Select a Tween 60 concentration. The stalagmometer counts drops for a fixed volume to determine surface tension.</p>
+                                
+                                <div class="space-y-4 flex-1">
+                                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Surfactant Concentration</label>
+                                    <select id="conc-select" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm font-medium text-white transition-all shadow-inner" onchange="app.state.surface.selectedConc = this.value; app.renderLab();" ${isMeasuring ? 'disabled':''}>
+                                        <option value="" disabled ${!s.selectedConc ? 'selected' : ''}>-- Select Solution --</option>
+                                        ${Object.keys(c).map(k => `<option value="${k}" ${s.selectedConc === k ? 'selected' : ''} ${s.data.find(d=>d.conc===k)?'disabled':''}>${k} Tween 60 ${s.data.find(d=>d.conc===k)?' (Measured)':''}</option>`).join('')}
+                                    </select>
+                                    
+                                    <button onclick="app.logic.surface.measure()" ${!s.selectedConc || isMeasuring || s.data.find(d=>d.conc===s.selectedConc) ? 'disabled' : ''} class="w-full py-4 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(8,145,178,0.3)] transition-all flex justify-center items-center gap-3">
+                                        ${isMeasuring ? '<i class="fa-solid fa-circle-notch fa-spin text-lg"></i> Counting...' : '<i class="fa-solid fa-play text-lg"></i> Start Stalagmometer'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-4 space-y-4">
+                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 flex flex-col items-center justify-center min-h-[280px] relative ${isMeasuring ? 'measuring' : ''}">
+                                <div class="absolute top-4 right-4 bg-slate-900 text-cyan-400 font-mono text-2xl px-4 py-2 rounded-lg border border-cyan-500/30 shadow-[0_0_10px_rgba(8,145,178,0.2)]">
+                                    <span id="drop-counter">${isMeasuring ? '0' : (s.data.find(d=>d.conc===s.selectedConc)?.drops || '0')}</span><span class="text-xs text-slate-500 ml-1">drops</span>
+                                </div>
+
+                                <!-- Stalagmometer -->
+                                <div class="absolute top-0 w-8 h-36 border-x-2 border-slate-400 bg-white/5 opacity-80 z-10 rounded-b">
+                                    <div class="w-full bg-cyan-400/40 liquid-fill" style="height: ${isMeasuring ? '10%' : '90%'}"></div>
+                                    <div class="absolute -bottom-8 left-1/2 -ml-[3px] w-1.5 h-3 bg-cyan-400 rounded-full anim-drop shadow-[0_0_5px_cyan]"></div>
+                                </div>
+                                
+                                <!-- Beaker -->
+                                <div class="absolute bottom-8 w-28 h-24 border-x-2 border-b-2 border-slate-400 rounded-b-xl z-0 flex flex-col justify-end overflow-hidden bg-slate-900/50">
+                                    <div class="w-full bg-cyan-400/30 liquid-fill backdrop-blur-sm" style="height: ${isMeasuring ? '80%' : '20%'}"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="glass-panel p-5 rounded-2xl border border-slate-700 bg-slate-900 min-h-[160px] relative overflow-hidden">
+                                <h3 class="font-bold text-sm text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">Microscopic Behavior</h3>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 relative shrink-0">
+                                        ${(!s.selectedConc || s.selectedConc === 'Water') ? '<div class="absolute inset-0 flex items-center justify-center text-slate-600 text-xs">No Surfactant</div>' : `
+                                            <div class="w-full h-full anim-micelle relative flex justify-center items-center">
+                                                <div class="absolute w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]" style="top:5px"></div><div class="absolute w-0.5 h-4 bg-slate-400" style="top:10px"></div>
+                                                <div class="absolute w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]" style="bottom:5px"></div><div class="absolute w-0.5 h-4 bg-slate-400" style="bottom:10px"></div>
+                                                <div class="absolute w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]" style="left:5px"></div><div class="absolute w-4 h-0.5 bg-slate-400" style="left:10px"></div>
+                                                <div class="absolute w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]" style="right:5px"></div><div class="absolute w-4 h-0.5 bg-slate-400" style="right:10px"></div>
+                                            </div>
+                                        `}
+                                    </div>
+                                    <p class="text-xs text-slate-300 leading-relaxed">
+                                        As concentration increases, surfactant molecules saturate the surface, lowering tension. At <strong>CMC</strong>, they form spherical <strong>micelles</strong> in the bulk liquid.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 space-y-4 flex flex-col">
+                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 flex-1 flex flex-col">
+                                <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3 flex items-center justify-between">
+                                    <span><i class="fa-solid fa-chart-line text-cyan-400 mr-2"></i>Surface Tension Plot</span>
+                                </h3>
+                                <div class="flex-1 relative min-h-[200px] bg-slate-900 rounded-xl p-2 border border-slate-800">
+                                    <canvas id="labChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="glass-panel p-5 rounded-2xl border border-slate-700 bg-slate-900">
+                                <div class="math-box text-sm space-y-3">
+                                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                        <span class="text-slate-400">Equation:</span>
+                                        <span class="bg-black/30 px-3 py-1 rounded-lg border border-slate-700 text-white">$\\gamma_2 = \\gamma_1 \\left(\\frac{d_2}{d_1}\\right) \\left(\\frac{n_1}{n_2}\\right)$</span>
+                                    </div>
+                                    ${s.data.length > 0 && !isMeasuring ? (() => {
+                                        const last = s.data[s.data.length-1];
+                                        if(last.conc === 'Water') return `<div class="text-center text-slate-500 italic py-2">Water reference recorded: $\\gamma_{w} = 72.8$</div>`;
+                                        const w = c['Water'], t = c[last.conc];
+                                        return `
+                                        <div class="bg-cyan-900/20 p-3 rounded-lg border border-cyan-800/50 scale-in">
+                                            <div class="mb-2 text-slate-300">$\\gamma_{${last.conc}} = 72.8 \\times \\left(\\frac{${t.density}}{${w.density}}\\right) \\times \\left(\\frac{${w.drops}}{${t.drops}}\\right)$</div>
+                                            <div class="text-lg font-bold text-cyan-400">$\\gamma = ${last.st.toFixed(2)} \\text{ dyne/cm}$</div>
+                                        </div>`;
+                                    })() : '<div class="text-center text-slate-600 italic py-4">Waiting for measurement...</div>'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                },
+
+                kinetics() {
+                    const s = app.state.kinetics;
+                    const temps = [45, 55, 70];
+                    const isComplete = s.time >= 30;
+                    
+                    return `
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-4 space-y-4">
+                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
+                                <h3 class="font-bold text-sm uppercase text-slate-500 mb-4 tracking-widest flex items-center justify-between">
+                                    Thermostatic Water Bath
+                                    <span class="bg-orange-500/20 text-orange-400 px-2 py-1 rounded border border-orange-500/30 text-xs font-mono">${s.temp}°C</span>
+                                </h3>
+                                
+                                <div class="flex gap-2 mb-6">
+                                    ${temps.map(t => `
+                                        <button onclick="app.logic.kinetics.setTemp(${t})" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all border ${s.temp === t ? 'bg-orange-600 text-white border-orange-400 shadow-[0_0_15px_rgba(234,88,12,0.4)]' : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-white'}">${t}°C</button>
+                                    `).join('')}
+                                </div>
+                                
+                                <!-- Immersive Water Bath -->
+                                <div class="relative h-48 bg-slate-900 border-2 border-slate-600 rounded-xl overflow-hidden flex items-end justify-center mb-6 shadow-inner">
+                                    <div class="absolute bottom-2 w-full flex justify-around opacity-80 z-20">
+                                        <div class="w-1/4 h-2 bg-gradient-to-r from-red-600 to-orange-500 rounded-full ${s.temp==70?'animate-pulse shadow-[0_0_10px_red]':''}"></div>
+                                        <div class="w-1/4 h-2 bg-gradient-to-r from-red-600 to-orange-500 rounded-full ${s.temp>=55?'animate-pulse shadow-[0_0_10px_red]':''}"></div>
+                                    </div>
+                                    <div class="w-full bg-cyan-500/30 backdrop-blur-[2px] z-10" style="height: 35%;">
+                                        ${s.temp > 45 ? `
+                                            <div class="bubble w-2 h-2 left-[20%] bottom-0" style="animation-duration: ${70/s.temp}s"></div>
+                                            <div class="bubble w-3 h-3 left-[50%] bottom-0" style="animation-duration: ${60/s.temp}s"></div>
+                                            <div class="bubble w-1.5 h-1.5 left-[80%] bottom-0" style="animation-duration: ${65/s.temp}s"></div>
+                                        ` : ''}
+                                    </div>
+                                    <div class="absolute bottom-6 w-20 h-24 z-0">
+                                        ${app.getFlaskSVG("rgba(255,255,255,0.7)", 60)}
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between bg-black/40 text-white p-4 rounded-xl mb-4 border border-slate-800 shadow-inner">
+                                    <span class="font-bold text-slate-400 uppercase tracking-widest text-xs">Elapsed Time</span>
+                                    <span class="text-3xl font-bold font-mono text-orange-400 drop-shadow-[0_0_5px_rgba(251,146,60,0.5)]">${s.time} <span class="text-sm">min</span></span>
+                                </div>
+                                
+                                <button onclick="app.logic.kinetics.advanceTime()" ${isComplete || s.sampling ? 'disabled' : ''} class="mt-auto w-full py-4 bg-orange-600 hover:bg-orange-500 disabled:bg-slate-800 disabled:text-slate-600 disabled:border-slate-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(234,88,12,0.3)] transition-all flex justify-center items-center gap-2 border border-orange-500">
+                                    ${s.sampling ? '<i class="fa-solid fa-spinner fa-spin text-lg"></i> Processing Sample...' : (isComplete ? '<i class="fa-solid fa-flag-checkered text-lg"></i> Analysis Complete' : '<i class="fa-solid fa-forward-step text-lg"></i> Advance 10m & Sample')}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-3 space-y-4 flex flex-col">
+                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <h3 class="font-bold text-sm text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2">First-Order Degradation</h3>
+                                    <div class="math-box text-sm space-y-4">
+                                        <div class="bg-black/30 p-3 rounded-xl border border-slate-700 shadow-inner text-center">
+                                            <div class="text-white text-lg">$\\log C = \\log C_0 - \\frac{k \\cdot t}{2.303}$</div>
+                                        </div>
+                                        
+                                        ${s.time > 0 ? (() => {
+                                            const d = s.data[s.temp].find(x => x.time === s.time);
+                                            const k = app.constants.kineticsData[s.temp].k;
+                                            return `
+                                            <div class="bg-orange-900/20 p-4 rounded-xl border border-orange-800/50 scale-in shadow-lg">
+                                                <div class="font-bold text-xs text-orange-500 mb-3 uppercase tracking-wider">State at $t = ${s.time}$ min:</div>
+                                                <div class="mb-2 text-slate-300">$\\log C = \\log(100) - \\frac{${k} \\times ${s.time}}{2.303}$</div>
+                                                <div class="font-bold text-orange-400 text-2xl mt-3 mb-1 bg-black/40 p-2 rounded text-center border border-orange-900/50">$\\log C = ${d.logC}$</div>
+                                                <div class="text-xs text-slate-400 text-center mt-2 border-t border-orange-900/50 pt-2">Active Aspirin Remaining: <strong class="text-white">${d.conc}%</strong></div>
+                                            </div>`;
+                                        })() : '<div class="text-slate-500 italic text-center mt-10">Advance timer to simulate degradation and view kinetic calculations.</div>'}
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 border border-slate-700 rounded-xl p-3 bg-slate-900/50">
+                                    <div class="text-[10px] uppercase font-bold text-slate-500 mb-2 text-center">Molecular Breakdown</div>
+                                    <div class="flex items-center justify-center gap-2 text-xs text-slate-400 font-mono">
+                                        <span>Aspirin</span> <i class="fa-solid fa-plus text-[8px]"></i> <span>H₂O</span>
+                                        <i class="fa-solid fa-arrow-right text-orange-500"></i>
+                                        <div class="flex flex-col items-center leading-tight"><span>Salicylic</span><span>Acid</span></div>
+                                        <i class="fa-solid fa-plus text-[8px]"></i>
+                                        <div class="flex flex-col items-center leading-tight"><span>Acetic</span><span>Acid</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 glass-panel rounded-2xl border border-slate-700 p-6 flex flex-col">
+                            <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3 flex items-center justify-between">
+                                <span><i class="fa-solid fa-chart-scatter text-orange-400 mr-2"></i>Arrhenius Plot Data (Log C vs Time)</span>
+                            </h3>
+                            <div class="flex-1 relative min-h-[300px] bg-slate-900 rounded-xl p-2 border border-slate-800">
+                                <canvas id="labChart"></canvas>
+                            </div>
+                            <div class="mt-4 text-xs text-slate-400 bg-black/40 p-3 rounded-lg border border-slate-700 math-box">
+                                <strong class="text-orange-400">Rate Constant ($k$):</strong> The slope of each line equals $-k/2.303$. Higher temperatures produce a steeper negative slope, proving heat accelerates drug degradation (Shelf-life reduction).
+                            </div>
+                        </div>
+                    </div>`;
+                },
+
+                viscosity() {
+                    const s = app.state.viscosity;
+                    const concs = [0.2, 0.4, 0.6, 0.8];
+                    const isMeasuring = s.measuring;
+                    
+                    return `
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-3 space-y-4">
+                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
+                                <h3 class="font-bold text-sm uppercase text-slate-500 mb-4 tracking-widest border-b border-slate-800 pb-2">Capillary Viscometer</h3>
+                                
+                                <div class="space-y-4 flex-1">
+                                    <select id="visc-conc-select" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm font-medium text-white shadow-inner transition-all" onchange="app.state.viscosity.conc = this.value; app.renderLab();" ${isMeasuring ? 'disabled':''}>
+                                        <option value="0" ${s.conc == 0 ? 'selected' : ''}>Water (Reference Base)</option>
+                                        ${concs.map(c => `<option value="${c}" ${s.conc == c ? 'selected' : ''} ${s.data.find(d=>d.c==c)?'disabled':''}>${c}% Gelatin Polymer ${s.data.find(d=>d.c==c)?' (Done)':''}</option>`).join('')}
+                                    </select>
+                                    
+                                    <button onclick="app.logic.viscosity.measure()" ${isMeasuring || s.data.find(d=>d.c==s.conc) ? 'disabled' : ''} class="w-full py-4 bg-amber-600 hover:bg-amber-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(217,119,6,0.3)] transition-all flex justify-center items-center gap-2 border border-amber-500">
+                                        ${isMeasuring ? '<i class="fa-solid fa-spinner fa-spin text-lg"></i> Fluid Flowing...' : '<i class="fa-solid fa-play text-lg"></i> Measure Flow Time'}
+                                    </button>
+                                </div>
+                                
+                                ${s.data.length > 0 ? `
+                                <div class="mt-6 border-t border-slate-800 pt-4 scale-in">
+                                    <h4 class="font-bold text-xs text-slate-400 mb-3 uppercase tracking-widest">Experimental Data</h4>
+                                    <div class="bg-black/30 rounded-lg border border-slate-700 overflow-hidden">
+                                        <table class="w-full text-[11px] text-left text-slate-300 border-collapse">
+                                            <thead class="bg-slate-800 text-slate-400 border-b border-slate-700">
+                                                <tr><th class="p-2 pl-3">Conc(%)</th><th class="p-2">t (sec)</th><th class="p-2 pr-3 text-right">$\\eta_{red}$</th></tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-800/50">
+                                                ${[...s.data].sort((a,b)=>a.c-b.c).map(d => `
+                                                    <tr class="hover:bg-slate-800/30 transition-colors">
+                                                        <td class="p-2 pl-3 font-semibold ${d.c==0?'text-cyan-400':''}">${d.c == 0 ? 'H₂O' : d.c}</td>
+                                                        <td class="p-2 font-mono">${d.t}s</td>
+                                                        <td class="p-2 pr-3 font-mono text-amber-400 text-right">${d.n_red ? d.n_red.toFixed(3) : '—'}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-4 space-y-4 flex flex-col">
+                            <div class="glass-panel p-6 rounded-2xl border border-slate-700 bg-slate-900 flex flex-col items-center justify-center min-h-[260px] relative shadow-inner">
+                                <div class="absolute top-4 right-4 bg-black/80 text-amber-400 font-mono text-2xl px-4 py-2 rounded-lg border border-amber-500/30 shadow-[0_0_10px_rgba(217,119,6,0.2)] z-20">
+                                    <i class="fa-solid fa-stopwatch text-lg mr-2 opacity-50"></i><span id="visc-timer">${isMeasuring ? s.flowTimer.toFixed(1) : (s.data.find(d=>d.c==s.conc)?.t || '0.0')}</span><span class="text-sm ml-1">s</span>
+                                </div>
+
+                                <!-- Correctly Shaped Custom SVG Ostwald Viscometer -->
+                                <div class="relative w-48 h-64 mt-4">
+                                    <svg viewBox="0 0 600 800" class="w-full h-full drop-shadow-xl" id="viscometer-svg">
+                                        <defs>
+                                            <clipPath id="visc-fluid-clip">
+                                                <!-- Perfect representation of the inner glass void -->
+                                                <path d="
+                                                    M 220 150 L 220 257.6 A 45 45 0 0 0 220 342.4 L 220 427.1 A 55 55 0 0 0 220 532.9 
+                                                    L 220 650 A 80 80 0 0 0 380 650 L 380 600 A 30 30 0 0 0 410 570 
+                                                    L 410 430 A 30 30 0 0 0 380 400 L 380 150 L 350 150 L 350 400 
+                                                    A 30 30 0 0 0 320 430 L 320 570 A 30 30 0 0 0 350 600 L 350 650 
+                                                    A 50 50 0 0 1 250 650 L 250 532.9 A 55 55 0 0 0 250 427.1 L 250 342.4 
+                                                    A 45 45 0 0 0 250 257.6 L 250 150 Z" />
+                                            </clipPath>
+                                        </defs>
+
+                                        <!-- Outer Glass Stroke -->
+                                        <path d="M 220 150 L 220 257.6 A 45 45 0 0 0 220 342.4 L 220 427.1 A 55 55 0 0 0 220 532.9 L 220 650 A 80 80 0 0 0 380 650 L 380 600 A 30 30 0 0 0 410 570 L 410 430 A 30 30 0 0 0 380 400 L 380 150" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.8)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                                        
+                                        <!-- Inner Glass Stroke -->
+                                        <path d="M 250 150 L 250 257.6 A 45 45 0 0 1 250 342.4 L 250 427.1 A 55 55 0 0 1 250 532.9 L 250 650 A 50 50 0 0 0 350 650 L 350 600 A 30 30 0 0 1 320 570 L 320 430 A 30 30 0 0 1 350 400 L 350 150" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+                                        <!-- Fluid Mask Group -->
+                                        <g clip-path="url(#visc-fluid-clip)">
+                                            <!-- Bottom U-Turn (always full) -->
+                                            <rect x="200" y="600" width="250" height="200" fill="rgba(6, 182, 212, 0.8)" />
+                                            
+                                            <!-- Left Measuring Bulb (Drains dynamically) -->
+                                            <!-- Moves down from Y=360 to Y=590 -->
+                                            <rect id="visc-left-fluid" x="185" y="${isMeasuring ? '590' : (s.data.find(d=>d.c==s.conc) ? '590' : '360')}" width="100" height="400" fill="rgba(6, 182, 212, 0.8)" style="transition: y ${isMeasuring ? '2.5s' : '0.5s'} linear;" />
+                                            
+                                            <!-- Right Reservoir Bulb (Rises dynamically) -->
+                                            <!-- Moves up from Y=550 to Y=450 -->
+                                            <rect id="visc-right-fluid" x="300" y="${isMeasuring ? '450' : (s.data.find(d=>d.c==s.conc) ? '450' : '550')}" width="150" height="400" fill="rgba(6, 182, 212, 0.8)" style="transition: y ${isMeasuring ? '2.5s' : '0.5s'} linear;" />
+                                        </g>
+
+                                        <!-- Red Calibration Marks -->
+                                        <line x1="190" y1="385" x2="280" y2="385" stroke="#ef4444" stroke-width="5" opacity="0.9" />
+                                        <line x1="190" y1="570" x2="280" y2="570" stroke="#ef4444" stroke-width="5" opacity="0.9" />
+                                        
+                                        <text x="145" y="400" fill="#ef4444" font-size="32px" font-family="sans-serif" font-weight="bold">a</text>
+                                        <text x="145" y="585" fill="#ef4444" font-size="32px" font-family="sans-serif" font-weight="bold">b</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <div class="glass-panel p-5 rounded-2xl border border-slate-700 flex-1">
+                                <h3 class="font-bold text-sm text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">Mathematical Derivation</h3>
+                                <div class="math-box text-sm">
+                                    ${s.data.length > 0 && !isMeasuring ? (() => {
+                                        const d = s.data[s.data.length-1];
+                                        if(d.c == 0) return `<div class="p-4 bg-cyan-900/20 border border-cyan-800/50 rounded-xl text-center text-cyan-200 scale-in"><i class="fa-solid fa-water block text-2xl mb-2 opacity-50"></i>Reference solvent flow time ($t_0$) successfully recorded: <br><strong class="text-xl font-mono text-cyan-400 mt-2 block">${d.t}s</strong></div>`;
+                                        
+                                        const t0 = app.constants.viscosityData['0'].time;
+                                        return `
+                                        <div class="bg-amber-900/20 p-4 rounded-xl border border-amber-800/50 scale-in text-[13px] space-y-3 shadow-lg">
+                                            <div class="flex justify-between items-center"><span class="text-slate-400">Relative ($\\eta_{rel}$)</span> <span class="text-white bg-black/30 px-2 py-1 rounded">$\\frac{${d.t}}{${t0}} = \\mathbf{${d.n_rel.toFixed(3)}}$</span></div>
+                                            <div class="flex justify-between items-center"><span class="text-slate-400">Specific ($\\eta_{sp}$)</span> <span class="text-white bg-black/30 px-2 py-1 rounded">${d.n_rel.toFixed(3)} - 1 = \\mathbf{${d.n_sp.toFixed(3)}}$</span></div>
+                                            <div class="flex justify-between items-center border-t border-amber-800/50 pt-2 mt-2"><span class="text-amber-500 font-bold">Reduced ($\\eta_{red}$)</span> <span class="text-amber-400 text-lg font-bold bg-black/50 px-2 py-1 rounded border border-amber-900">$\\frac{${d.n_sp.toFixed(3)}}{${d.c}} = \\mathbf{${d.n_red.toFixed(3)}}$</span></div>
+                                        </div>`;
+                                    })() : '<div class="text-slate-500 italic text-center mt-8 text-xs bg-slate-900/50 p-4 rounded-lg border border-slate-800">System calculates $\\eta_{rel}$, $\\eta_{sp}$, and $\\eta_{red}$ sequentially upon measuring a polymer concentration.</div>'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 glass-panel rounded-2xl border border-slate-700 p-6 flex flex-col">
+                            <h3 class="font-bold text-xl mb-4 text-white border-b border-slate-700 pb-3 flex items-center justify-between">
+                                <span><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i>Intrinsic Viscosity Determination</span>
+                            </h3>
+                            <div class="flex-1 relative min-h-[300px] bg-slate-900 rounded-xl p-2 border border-slate-800">
+                                <canvas id="labChart"></canvas>
+                            </div>
+                            <div class="mt-4 text-[13px] text-slate-300 bg-black/40 p-4 rounded-xl border border-slate-700 math-box shadow-inner">
+                                <span class="text-amber-400 font-bold uppercase text-xs tracking-wider block mb-1">Mark-Houwink Equation</span>
+                                Extrapolate the line to the Y-axis (Concentration = 0) to find the <strong>Intrinsic Viscosity $[\\eta]$</strong>. Then calculate Molecular Weight ($M$) using:
+                                <div class="text-center text-white text-lg mt-2 bg-slate-800/50 py-1 rounded border border-slate-700"> $[\\eta] = KM^\\alpha$</div>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+            },
+
+            // --- ADVANCED LOGIC ---
+            logic: {
+                solubility: {
+                    titrate() {
+                        const s = app.state.solubility;
+                        if(s.dissolved) return;
+                        
+                        s.measuring = true;
+                        app.renderLab();
+                        
+                        setTimeout(() => {
+                            s.alcohol += 1;
+                            s.measuring = false;
+                            if(s.alcohol >= s.maxAlcohol) {
+                                s.dissolved = true;
+                                s.step = 3;
+                            }
+                            app.renderLab();
+                        }, 500);
+                    }
+                },
+
+                aspirin: {
+                    selectFlask(tsc) {
+                        app.state.aspirin.activeFlask = tsc;
+                        app.state.aspirin.naohAdded = 0;
+                        app.state.aspirin.endpoint = 0;
+                        app.renderLab();
+                    },
+                    titrationInterval: null,
+                    startTitrate() {
+                        const s = app.state.aspirin;
+                        if(s.activeFlask === null || s.endpoint === 1) return;
+                        
+                        s.titrating = true;
+                        
+                        // Manipulate specific DOM elements to completely avoid render flickering
+                        const dropAnim = document.getElementById('titration-drop');
+                        if (dropAnim) dropAnim.style.display = 'block';
+                        
+                        const target = app.constants.aspirinTitration[s.activeFlask].expectedNaoh;
+                        
+                        this.titrationInterval = setInterval(() => {
+                            s.naohAdded += 0.1;
+                            if(s.naohAdded >= target) {
+                                this.stopTitrate();
+                                s.endpoint = 1;
+                                
+                                if(!s.data.find(d => d.tsc === s.activeFlask)) {
+                                    s.data.push({ 
+                                        tsc: s.activeFlask, 
+                                        dissolved: app.constants.aspirinTitration[s.activeFlask].dissolved 
+                                    });
+                                    s.data.sort((a, b) => a.tsc - b.tsc);
+                                }
+                                app.renderLab(); // Only re-render once it reaches the endpoint
+                            } else {
+                                // Update elements without full DOM rebuild
+                                const numEl = document.getElementById('naoh-volume-text');
+                                if(numEl) numEl.innerText = `${s.naohAdded.toFixed(1)} ml NaOH`;
+                                const liqEl = document.getElementById('burette-liquid');
+                                if(liqEl) liqEl.style.height = `${100 - (s.naohAdded*10)}%`;
+                            }
+                        }, 50);
+                    },
+                    stopTitrate() {
+                        app.state.aspirin.titrating = false;
+                        if(this.titrationInterval) clearInterval(this.titrationInterval);
+                        
+                        const dropAnim = document.getElementById('titration-drop');
+                        if(dropAnim) dropAnim.style.display = 'none';
+                    },
+                    drawChart() {
+                        const data = app.state.aspirin.data;
+                        if(data.length === 0) return;
+
+                        Chart.defaults.color = '#94a3b8';
+                        Chart.defaults.font.family = 'Segoe UI';
+
+                        const ctx = document.getElementById('labChart').getContext('2d');
+                        app.chartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: data.map(d => d.tsc + 'g'),
+                                datasets: [{
+                                    label: '% Aspirin Dissolved',
+                                    data: data.map(d => d.dissolved),
+                                    borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                                    borderWidth: 3, pointBackgroundColor: '#d8b4fe', pointRadius: 6, pointBorderColor: '#a855f7', pointBorderWidth: 2,
+                                    fill: true, tension: 0.4
+                                }]
+                            },
+                            options: {
+                                responsive: true, maintainAspectRatio: false,
+                                plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', bodyColor: '#d8b4fe', borderColor: '#7e22ce', borderWidth: 1 } },
+                                scales: {
+                                    y: { beginAtZero: true, max: 100, title: { display: true, text: '% Dissolved', color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                    x: { title: { display: true, text: 'Tri-sodium Citrate (g)', color: '#cbd5e1' }, grid: { display: false } }
+                                }
+                            }
+                        });
+                    }
+                },
+
+                surface: {
+                    measure() {
+                        const s = app.state.surface;
+                        if(!s.selectedConc) return;
+                        
+                        s.measuring = true;
+                        const cData = app.constants.surfaceData[s.selectedConc];
+                        const targetDrops = cData.drops;
+                        s.drops = 0;
+                        app.renderLab();
+
+                        const interval = setInterval(() => {
+                            s.drops += 1;
+                            const counter = document.getElementById('drop-counter');
+                            if (counter) counter.innerText = s.drops;
+                            
+                            if(s.drops >= targetDrops) {
+                                clearInterval(interval);
+                                finishMeasurement();
+                            }
+                        }, 40);
+
+                        const finishMeasurement = () => {
+                            const stBase = 72.8; 
+                            let calcSt = stBase;
+                            
+                            if(s.selectedConc !== 'Water') {
+                                const water = app.constants.surfaceData['Water'];
+                                calcSt = stBase * (cData.density / water.density) * (water.drops / cData.drops);
+                            }
+
+                            s.data.push({
+                                conc: s.selectedConc, drops: cData.drops, st: calcSt,
+                                numericConc: s.selectedConc === 'Water' ? 0 : parseFloat(s.selectedConc)
+                            });
+                            s.measuring = false;
+                            app.renderLab();
+                        };
+                    },
+                    drawChart() {
+                        const data = [...app.state.surface.data].sort((a, b) => a.numericConc - b.numericConc);
+                        if(data.length === 0) return;
+
+                        Chart.defaults.color = '#94a3b8';
+                        const ctx = document.getElementById('labChart').getContext('2d');
+                        
+                        let cmcIndex = -1;
+                        if(data.length > 3) {
+                            for(let i=2; i<data.length; i++) {
+                                if(Math.abs(data[i].st - data[i-1].st) < 2) { cmcIndex = i-1; break; }
+                            }
+                        }
+
+                        app.chartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: data.map(d => d.conc),
+                                datasets: [{
+                                    label: 'Surface Tension',
+                                    data: data.map(d => d.st),
+                                    borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                                    borderWidth: 3, pointBackgroundColor: '#67e8f9', pointRadius: 6, pointBorderColor: '#06b6d4', pointBorderWidth: 2,
+                                    tension: 0.1
+                                }]
+                            },
+                            options: {
+                                responsive: true, maintainAspectRatio: false,
+                                plugins: { 
+                                    legend: { display: false },
+                                    annotation: cmcIndex > -1 ? {
+                                        annotations: {
+                                            line1: {
+                                                type: 'line', xMin: cmcIndex, xMax: cmcIndex,
+                                                borderColor: 'rgba(236, 72, 153, 0.5)', borderWidth: 2, borderDash: [5, 5],
+                                                label: { content: 'CMC Region', display: true, position: 'start', backgroundColor: 'rgba(236, 72, 153, 0.8)' }
+                                            }
+                                        }
+                                    } : {}
+                                },
+                                scales: {
+                                    y: { title: { display: true, text: 'Surface Tension (dyne/cm)', color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                    x: { title: { display: true, text: 'Concentration (%)', color: '#cbd5e1' }, grid: { display: false } }
+                                }
+                            }
+                        });
+                    }
+                },
+
+                kinetics: {
+                    setTemp(t) {
+                        app.state.kinetics.temp = t;
+                        app.state.kinetics.time = 0; 
+                        if(app.state.kinetics.data[t].length === 0) {
+                             app.state.kinetics.data[t].push({ time: 0, conc: 100, logC: 2 });
+                        }
+                        app.renderLab();
+                    },
+                    advanceTime() {
+                        const s = app.state.kinetics;
+                        if(s.time >= 30) return;
+                        
+                        s.sampling = true;
+                        app.renderLab();
+
+                        setTimeout(() => {
+                            if(s.data[s.temp].length === 0) {
+                                s.data[s.temp].push({ time: 0, conc: 100, logC: 2 });
+                            }
+
+                            s.time += 10;
+                            const k = app.constants.kineticsData[s.temp].k;
+                            const conc = 100 * Math.exp(-k * s.time);
+                            const logC = Math.log10(conc);
+
+                            s.data[s.temp].push({ time: s.time, conc: conc.toFixed(2), logC: logC.toFixed(4) });
+                            s.sampling = false;
+                            app.renderLab();
+                        }, 1200);
+                    },
+                    drawChart() {
+                        const s = app.state.kinetics;
+                        Chart.defaults.color = '#94a3b8';
+                        const ctx = document.getElementById('labChart').getContext('2d');
+                        
+                        const datasets = [45, 55, 70].map((t, idx) => {
+                            const colors = ['#3b82f6', '#f59e0b', '#ef4444'];
+                            const bgColors = ['rgba(59, 130, 246, 0.2)', 'rgba(245, 158, 11, 0.2)', 'rgba(239, 68, 68, 0.2)'];
+                            return {
+                                label: `${t}°C`,
+                                data: s.data[t].map(d => ({ x: d.time, y: parseFloat(d.logC) })),
+                                borderColor: colors[idx], backgroundColor: bgColors[idx],
+                                showLine: true, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderWidth: 2, borderWidth: 3
+                            };
+                        }).filter(ds => ds.data.length > 0);
+
+                        if(datasets.length === 0) return;
+
+                        app.chartInstance = new Chart(ctx, {
+                            type: 'scatter',
+                            data: { datasets },
+                            options: {
+                                responsive: true, maintainAspectRatio: false,
+                                plugins: { legend: { position: 'top', labels: { color: '#fff', usePointStyle: true } } },
+                                scales: {
+                                    y: { title: { display: true, text: 'Log Concentration', color: '#cbd5e1' }, min: 1.0, max: 2.1, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                    x: { title: { display: true, text: 'Time (min)', color: '#cbd5e1' }, min: 0, max: 35, ticks: { stepSize: 10 }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                                }
+                            }
+                        });
+                    }
+                },
+
+                viscosity: {
+                    measure() {
+                        const s = app.state.viscosity;
+                        s.measuring = true;
+                        const cData = app.constants.viscosityData[s.conc];
+                        const targetTime = cData.time;
+                        s.flowTimer = 0;
+                        app.renderLab();
+
+                        const realTimeMs = 2500; 
+                        const start = Date.now();
+
+                        const interval = setInterval(() => {
+                            const elapsed = Date.now() - start;
+                            const progress = Math.min(elapsed / realTimeMs, 1);
+                            s.flowTimer = progress * targetTime;
+                            
+                            const timerEl = document.getElementById('visc-timer');
+                            if(timerEl) timerEl.innerText = s.flowTimer.toFixed(1);
+
+                            if(progress >= 1) {
+                                clearInterval(interval);
+                                finishMeasurement();
+                            }
+                        }, 40);
+
+                        const finishMeasurement = () => {
+                            const t0 = app.constants.viscosityData['0'].time;
+                            const t = targetTime;
+                            
+                            let n_rel = null, n_sp = null, n_red = null;
+                            if(s.conc != 0) {
+                                n_rel = t / t0;
+                                n_sp = n_rel - 1;
+                                n_red = n_sp / parseFloat(s.conc);
+                            }
+
+                            s.data.push({ c: parseFloat(s.conc), t: t, n_rel, n_sp, n_red });
+                            s.measuring = false;
+                            app.renderLab();
+                        };
+                    },
+                    drawChart() {
+                        const rawData = app.state.viscosity.data.filter(d => d.c > 0);
+                        if(rawData.length === 0) return;
+
+                        const data = [...rawData].sort((a,b) => a.c - b.c);
+                        
+                        const xData = data.map(d=>d.c), yData = data.map(d=>d.n_red);
+                        let sumX=0, sumY=0, sumXY=0, sumX2=0; const n = xData.length;
+                        for(let i=0; i<n; i++) { sumX += xData[i]; sumY += yData[i]; sumXY += xData[i]*yData[i]; sumX2 += xData[i]*xData[i]; }
+                        const slope = n>1 ? (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX) : 0;
+                        const intercept = n>1 ? (sumY - slope*sumX) / n : (n==1 ? yData[0] : 0);
+                        
+                        const chartData = n>1 ? [{c:0, n_red:intercept}, ...data] : data;
+
+                        Chart.defaults.color = '#94a3b8';
+                        const ctx = document.getElementById('labChart').getContext('2d');
+                        
+                        app.chartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: chartData.map(d => d.c),
+                                datasets: [{
+                                    label: 'Reduced Viscosity',
+                                    data: chartData.map(d => d.n_red),
+                                    borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                    borderWidth: 3, pointBackgroundColor: (ctx) => ctx.dataIndex === 0 ? '#ef4444' : '#fcd34d', pointRadius: (ctx) => ctx.dataIndex === 0 ? 8 : 6, pointBorderColor: '#f59e0b', pointBorderWidth: 2,
+                                    segment: { borderDash: ctx => ctx.p0DataIndex === 0 ? [6, 6] : undefined }
+                                }]
+                            },
+                            options: {
+                                responsive: true, maintainAspectRatio: false,
+                                plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.dataIndex === 0 ? `Intrinsic Viscosity [η] = ${ctx.raw.toFixed(3)}` : `η_red = ${ctx.raw.toFixed(3)}` } } },
+                                scales: {
+                                    y: { title: { display: true, text: 'Reduced Viscosity (η_red)', color: '#cbd5e1' }, suggestedMin: intercept * 0.8, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                    x: { title: { display: true, text: 'Concentration (w/v %)', color: '#cbd5e1' }, min: 0, grid: { display: false } }
+                                }
+                            }
+                        });
+                    }
+                }
+            },
+
+            // --- QUIZ MODULE ---
+            openQuiz() {
+                const modal = document.getElementById('quiz-modal');
+                const content = document.getElementById('quiz-content');
+                
+                const questions = [
+                    { q: "Why is the absorption of aspirin in the intestine greater than in the stomach?", a: "The intestine offers a larger surface area and its pH is more favorable to aspirin absorption (slightly alkaline media).", opts: ["Because the stomach breaks it down immediately.", "The intestine offers a larger surface area and its pH is more favorable to aspirin absorption.", "Because aspirin is completely insoluble in stomach acid.", "It is actively transported only in the intestine."] },
+                    { q: "What happens when tri-sodium citrate is applied above the amount required to dissolve aspirin?", a: "Excess dissociates into citrate and sodium ions, forming NaOH which causes the endpoint to be reached artificially faster.", opts: ["Solubility continues to increase indefinitely.", "The solution freezes.", "Excess dissociates into ions, buffering interference causes the endpoint to be reached faster artificially.", "The aspirin precipitates completely into a solid block."] },
+                    { q: "According to USP, if we dissolve 1 part of solute in 82 parts of solvent, how is it described?", a: "Sparingly soluble (30-100 parts)", opts: ["Very soluble", "Freely soluble", "Sparingly soluble", "Slightly soluble"] },
+                    { q: "In the Surface Tension lab, what does the critical micelle concentration (CMC) indicate?", a: "The point where the surface is fully saturated and molecules begin forming micelles in the bulk liquid.", opts: ["The liquid evaporates.", "The surface is fully saturated and molecules form micelles in the bulk.", "The solvent turns into a solid.", "The point where surface tension reaches its absolute maximum."] },
+                    { q: "How do we find the intrinsic viscosity from the reduced viscosity graph?", a: "By extrapolating the line to infinite dilution (Y-axis intercept where concentration = 0).", opts: ["By taking the highest value on the curve.", "By extrapolating the line to infinite dilution (Y-intercept where C=0).", "By calculating the area under the curve.", "By multiplying the slope by 100."] }
+                ];
+
+                let html = '<div class="space-y-6">';
+                questions.forEach((q, i) => {
+                    html += `
+                    <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                        <p class="font-bold text-lg text-white mb-4"><span class="text-blue-500 mr-2">Q${i+1}.</span> ${q.q}</p>
+                        <div class="space-y-3 pl-6">
+                            ${q.opts.sort(()=>Math.random()-0.5).map((opt, j) => `
+                                <label class="flex items-start gap-3 cursor-pointer group">
+                                    <div class="mt-1 relative flex items-center justify-center">
+                                        <input type="radio" name="q${i}" value="${opt === q.a ? 'correct' : 'wrong'}" class="peer sr-only" onchange="this.parentElement.parentElement.parentElement.querySelectorAll('label').forEach(l=>l.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-900/20', 'ring-rose-500', 'bg-rose-900/20')); if(this.value==='correct') { this.parentElement.parentElement.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-900/20'); } else { this.parentElement.parentElement.classList.add('ring-2', 'ring-rose-500', 'bg-rose-900/20'); }">
+                                        <div class="w-5 h-5 rounded-full border-2 border-slate-500 peer-checked:border-transparent bg-slate-900 transition-colors group-hover:border-blue-400"></div>
+                                        <div class="absolute w-2.5 h-2.5 rounded-full bg-blue-500 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                                    </div>
+                                    <span class="text-slate-300 group-hover:text-white transition-colors">${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>`;
+                });
+                html += '</div>';
+                
+                content.innerHTML = html;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        };
+
+        window.onload = () => {
+            app.state.kinetics.data[45].push({ time: 0, conc: 100, logC: 2 });
+            app.init();
+        };
+    </script>
+</body>
+</html>
