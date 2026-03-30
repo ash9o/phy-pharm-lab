@@ -86,50 +86,64 @@
 
     <!-- Sidebar Navigation -->
     <aside id="sidebar" class="w-80 bg-slate-900 flex flex-col shadow-2xl z-50 shrink-0 border-r border-slate-800 fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out">
-        <div class="p-5 md:p-6 bg-slate-950 text-white font-bold text-xl md:text-2xl flex items-center justify-between border-b border-slate-800 tracking-tight">
+        <div class="p-5 md:p-6 bg-slate-950 text-white font-bold text-xl md:text-2xl flex items-center justify-between border-b border-slate-800 tracking-tight shrink-0">
             <div class="flex items-center gap-3 md:gap-4">
                 <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
                     <i class="fa-solid fa-microscope text-white text-base md:text-xl"></i>
                 </div>
                 <span>PharmaLab <span class="text-blue-500 font-light">Pro</span></span>
             </div>
-            <!-- Close button for mobile -->
             <button onclick="app.toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white p-2 focus:outline-none">
                 <i class="fa-solid fa-xmark text-2xl"></i>
             </button>
         </div>
         
-        <div class="px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-widest mt-2">Laboratory Modules</div>
-        
-        <nav class="flex-1 overflow-y-auto px-3 space-y-1 pb-6">
-            <button onclick="app.switchLab('solubility')" id="nav-solubility" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all bg-slate-800 text-white border border-slate-700 shadow-sm relative overflow-hidden group">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
-                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-droplet w-6 text-blue-400"></i> Lab 1: Solubility Methods</span>
-                <span class="text-xs text-slate-400 ml-9 mt-1">Co-Solvency, Salts & Complexation</span>
-            </button>
-            <button onclick="app.switchLab('aspirin')" id="nav-aspirin" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
-                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-capsules w-6 text-purple-400"></i> Lab 2: Aspirin Solubilization</span>
-                <span class="text-xs text-slate-500 ml-9 mt-1">Tri-sodium Citrate Titration</span>
-            </button>
-            <button onclick="app.switchLab('surface')" id="nav-surface" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
-                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-water w-6 text-cyan-400"></i> Lab 4: Surface Tension</span>
-                <span class="text-xs text-slate-500 ml-9 mt-1">Stalagmometer & Micelle Formation</span>
-            </button>
-            <button onclick="app.switchLab('kinetics')" id="nav-kinetics" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
-                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-stopwatch w-6 text-orange-400"></i> Lab 5: Reaction Kinetics</span>
-                <span class="text-xs text-slate-500 ml-9 mt-1">Aspirin Hydrolysis Tracking</span>
-            </button>
-            <button onclick="app.switchLab('viscosity')" id="nav-viscosity" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
-                <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-hourglass-half w-6 text-amber-400"></i> Lab 6: Polymer Viscosity</span>
-                <span class="text-xs text-slate-500 ml-9 mt-1">Capillary Flow & Molecular Weight</span>
-            </button>
-        </nav>
+        <div class="flex-1 overflow-y-auto pb-6">
+            <div class="px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-widest mt-2">Laboratory Modules</div>
+            <nav class="px-3 space-y-1">
+                <button onclick="app.switchLab('solubility')" id="nav-solubility" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all bg-slate-800 text-white border border-slate-700 shadow-sm relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                    <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-droplet w-6 text-blue-400"></i> Lab 1: Solubility Methods</span>
+                    <span class="text-xs text-slate-400 ml-9 mt-1">Co-Solvency, Salts & Complexation</span>
+                </button>
+                <button onclick="app.switchLab('aspirin')" id="nav-aspirin" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                    <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-capsules w-6 text-purple-400"></i> Lab 2: Aspirin Solubilization</span>
+                    <span class="text-xs text-slate-500 ml-9 mt-1">Tri-sodium Citrate Titration</span>
+                </button>
+                <button onclick="app.switchLab('micellar')" id="nav-micellar" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                    <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-soap w-6 text-teal-400"></i> Lab 3: Micellar Solubilization</span>
+                    <span class="text-xs text-slate-500 ml-9 mt-1">Surfactants & Phenol Red Titration</span>
+                </button>
+                <button onclick="app.switchLab('surface')" id="nav-surface" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                    <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-water w-6 text-cyan-400"></i> Lab 4: Surface Tension</span>
+                    <span class="text-xs text-slate-500 ml-9 mt-1">Stalagmometer & Micelle Formation</span>
+                </button>
+                <button onclick="app.switchLab('kinetics')" id="nav-kinetics" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                    <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-stopwatch w-6 text-orange-400"></i> Lab 5: Reaction Kinetics</span>
+                    <span class="text-xs text-slate-500 ml-9 mt-1">Aspirin Hydrolysis Tracking</span>
+                </button>
+                <button onclick="app.switchLab('viscosity')" id="nav-viscosity" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                    <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-hourglass-half w-6 text-amber-400"></i> Lab 6: Polymer Viscosity</span>
+                    <span class="text-xs text-slate-500 ml-9 mt-1">Capillary Flow & Molecular Weight</span>
+                </button>
+            </nav>
 
-        <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+            <div class="px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-widest mt-4 border-t border-slate-800/50 pt-4">Study Materials</div>
+            <nav class="px-3 space-y-1">
+                <button onclick="app.switchLab('studyGuide')" id="nav-studyGuide" class="nav-btn w-full flex flex-col px-4 py-3 rounded-xl hover:bg-slate-800 text-left transition-all text-slate-400 border border-transparent relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-slate-600 transition-colors"></div>
+                    <span class="flex items-center gap-3 font-semibold text-[15px]"><i class="fa-solid fa-book-open w-6 text-indigo-400"></i> Answer Keys</span>
+                    <span class="text-xs text-slate-500 ml-9 mt-1">Solubility & Solubilization Quizzes</span>
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 bg-slate-900/50 shrink-0">
             <button onclick="app.openQuiz()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold rounded-lg shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
                 <i class="fa-solid fa-graduation-cap"></i> Final Lab Assessment
             </button>
@@ -145,14 +159,14 @@
                 </button>
                 <div class="min-w-0 flex-1">
                     <div class="flex items-center gap-2 md:gap-3 mb-1 flex-wrap">
-                        <span id="header-badge" class="px-2 py-0.5 rounded text-[10px] md:text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 whitespace-nowrap">Lab 1</span>
+                        <span id="header-badge" class="px-2 md:px-2.5 py-0.5 rounded text-[10px] md:text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 whitespace-nowrap">Lab 1</span>
                         <h1 id="header-title" class="text-xl md:text-3xl font-bold text-white tracking-tight truncate">Solubility Enhancements</h1>
                     </div>
                     <p id="header-subtitle" class="text-slate-400 text-xs md:text-sm max-w-2xl truncate sm:whitespace-normal line-clamp-1 sm:line-clamp-none">Explore three methods to increase solubility: Co-solvency, Salt Formation, and Complexation.</p>
                 </div>
             </div>
             <button onclick="app.resetCurrentLab()" class="px-3 md:px-4 py-2 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/50 text-slate-300 rounded-lg text-xs md:text-sm font-semibold transition-all border border-slate-700 flex items-center gap-2 group shrink-0 w-full sm:w-auto justify-center">
-                <i class="fa-solid fa-rotate-right group-hover:animate-spin"></i><span>Reset Experiment</span>
+                <i class="fa-solid fa-rotate-right group-hover:animate-spin"></i><span>Reset Activity</span>
             </button>
         </header>
 
@@ -192,6 +206,7 @@
             state: {
                 solubility: { part: 1, step: 0, water: 10, alcohol: 0, maxAlcohol: 4, dissolved: false, saltStep: 0, complexStep: 0 },
                 aspirin: { step: 0, activeFlask: null, titrating: false, naohAdded: 0, endpoint: 0, data: [] },
+                micellar: { activeFlask: null, titrating: false, naohAdded: 0, endpoint: 0, data: [] },
                 surface: { step: 0, selectedConc: null, drops: 0, measuring: false, data: [] },
                 kinetics: { temp: 45, time: 0, sampling: false, data: {45:[], 55:[], 70:[]} },
                 viscosity: { conc: 0, measuring: false, flowTimer: 0, data: [] }
@@ -201,7 +216,8 @@
                 surfaceData: { 'Water': { drops: 30, st: 72.8, density: 1.0 }, '0.01%': { drops: 35, density: 1.01 }, '0.03%': { drops: 42, density: 1.02 }, '0.05%': { drops: 48, density: 1.04 }, '0.075%': { drops: 54, density: 1.05 }, '0.1%': { drops: 60, density: 1.1 }, '0.2%': { drops: 61, density: 1.2 } },
                 viscosityData: { '0': { time: 10 }, '0.2': { time: 11.2 }, '0.4': { time: 12.5 }, '0.6': { time: 13.9 }, '0.8': { time: 15.4 } },
                 kineticsData: { 45: { k: 0.0105 }, 55: { k: 0.0223 }, 70: { k: 0.0510 } },
-                aspirinTitration: { 0: { expectedNaoh: 2.5, dissolved: 25 }, 1: { expectedNaoh: 5.0, dissolved: 50 }, 2: { expectedNaoh: 8.5, dissolved: 85 }, 3: { expectedNaoh: 8.0, dissolved: 80 } }
+                aspirinTitration: { 0: { expectedNaoh: 2.5, dissolved: 25 }, 1: { expectedNaoh: 5.0, dissolved: 50 }, 2: { expectedNaoh: 8.5, dissolved: 85 }, 3: { expectedNaoh: 8.0, dissolved: 80 } },
+                micellarTitration: { 0: { expectedNaoh: 2.9 }, 0.05: { expectedNaoh: 3.5 }, 0.5: { expectedNaoh: 5.8 }, 1: { expectedNaoh: 8.4 }, 5: { expectedNaoh: 18.5 } }
             },
 
             init() { setTimeout(() => this.renderLab(), 500); },
@@ -253,9 +269,11 @@
                 const titles = {
                     solubility: { badge: "Lab 1", color: "blue", t: "Solubility Enhancements", s: "Explore Co-solvency, Salt Formation, and Complexation techniques." },
                     aspirin: { badge: "Lab 2", color: "purple", t: "Aspirin Complexation", s: "Perform a full titration to observe the effect of Tri-sodium Citrate." },
+                    micellar: { badge: "Lab 3", color: "teal", t: "Micellar Solubilization", s: "Use Tween 60 surfactant to increase the solubility of Salicylic Acid via micelle formation." },
                     surface: { badge: "Lab 4", color: "cyan", t: "Surface Tension & CMC", s: "Analyze surfactant behavior at the microscopic and macroscopic levels." },
                     kinetics: { badge: "Lab 5", color: "orange", t: "Chemical Kinetics", s: "Track the molecular breakdown of Aspirin at different temperatures over time." },
-                    viscosity: { badge: "Lab 6", color: "amber", t: "Polymer Viscosity", s: "Determine the intrinsic viscosity and molecular weight of gelatin using capillary flow." }
+                    viscosity: { badge: "Lab 6", color: "amber", t: "Polymer Viscosity", s: "Determine the intrinsic viscosity and molecular weight of gelatin using capillary flow." },
+                    studyGuide: { badge: "Review", color: "indigo", t: "Study Guide & Answer Key", s: "Physical Pharmacy Lab: Solubility & Solubilization Quizzes." }
                 };
                 
                 const meta = titles[labId];
@@ -272,9 +290,11 @@
                 switch(this.currentLab) {
                     case 'solubility': this.state.solubility = { part: 1, step: 0, water: 10, alcohol: 0, maxAlcohol: 4, dissolved: false, saltStep: 0, complexStep: 0 }; break;
                     case 'aspirin': this.state.aspirin = { step: 0, activeFlask: null, titrating: false, naohAdded: 0, endpoint: 0, data: [] }; break;
+                    case 'micellar': this.state.micellar = { activeFlask: null, titrating: false, naohAdded: 0, endpoint: 0, data: [] }; break;
                     case 'surface': this.state.surface = { step: 0, selectedConc: null, drops: 0, measuring: false, data: [] }; break;
                     case 'kinetics': this.state.kinetics = { temp: 45, time: 0, sampling: false, data: {45:[], 55:[], 70:[]} }; break;
                     case 'viscosity': this.state.viscosity = { conc: 0, measuring: false, flowTimer: 0, data: [] }; break;
+                    case 'studyGuide': break;
                 }
                 if (this.chartInstance) { this.chartInstance.destroy(); this.chartInstance = null; }
                 this.renderLab();
@@ -286,15 +306,18 @@
                 switch(this.currentLab) {
                     case 'solubility': content = this.views.solubility(); break;
                     case 'aspirin': content = this.views.aspirin(); break;
+                    case 'micellar': content = this.views.micellar(); break;
                     case 'surface': content = this.views.surface(); break;
                     case 'kinetics': content = this.views.kinetics(); break;
                     case 'viscosity': content = this.views.viscosity(); break;
+                    case 'studyGuide': content = this.views.studyGuide(); break;
                 }
                 container.innerHTML = `<div class="fade-in max-w-7xl mx-auto">${content}</div>`;
                 this.renderMath();
 
                 setTimeout(() => {
                     if(this.currentLab === 'aspirin') this.logic.aspirin.drawChart();
+                    if(this.currentLab === 'micellar') this.logic.micellar.drawChart();
                     if(this.currentLab === 'surface') this.logic.surface.drawChart();
                     if(this.currentLab === 'kinetics') this.logic.kinetics.drawChart();
                     if(this.currentLab === 'viscosity') this.logic.viscosity.drawChart();
@@ -304,23 +327,132 @@
             getFlaskSVG(fillColor, yFill, extras = '') {
                 const clipId = 'flask-clip-' + Math.random().toString(36).substr(2, 9);
                 return `
-                <svg viewBox="0 0 100 120" class="absolute inset-0 w-full h-full z-0 overflow-visible drop-shadow-xl max-w-full">
+                <svg viewBox="0 0 100 120" class="absolute inset-0 w-full h-full z-0 drop-shadow-xl max-w-full">
                     <defs>
                         <clipPath id="${clipId}">
                             <path d="M 40 5 L 60 5 L 60 45 L 90 105 C 95 115 85 120 80 120 L 20 120 C 15 120 5 115 10 105 L 40 45 Z" />
                         </clipPath>
                     </defs>
                     <path d="M 40 5 L 60 5 L 60 45 L 90 105 C 95 115 85 120 80 120 L 20 120 C 15 120 5 115 10 105 L 40 45 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.4)" stroke-width="2" />
+                    <!-- Fluid layer constrained perfectly within the glass boundaries -->
                     <g clip-path="url(#${clipId})">
-                        <rect x="0" y="${yFill}" width="100" height="120" class="flask-liquid-fill" fill="${fillColor}" />
+                        <rect x="0" y="${yFill}" width="100" height="150" class="flask-liquid-fill" fill="${fillColor}" />
                         ${extras}
                     </g>
-                    <!-- Glass Rim -->
                     <rect x="37" y="5" width="26" height="4" rx="2" fill="rgba(255,255,255,0.5)" />
                 </svg>`;
             },
 
             views: {
+                studyGuide() {
+                    return `
+                    <div class="space-y-6 md:space-y-8 fade-in pb-10">
+                        
+                        <!-- Group 1 -->
+                        <div class="glass-panel rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+                            <div class="bg-slate-800/80 px-5 py-4 border-b border-slate-700">
+                                <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-layer-group text-blue-400"></i> Group 1</h2>
+                            </div>
+                            <div class="p-5 md:p-6 space-y-6">
+                                <div>
+                                    <p class="font-semibold text-slate-200 mb-2 text-sm md:text-base leading-snug"><span class="text-blue-400 mr-2">Q4/</span>Calculate the percentage of drug x g in final volume 30ml, if you know every 5ml from NaOH equal (0.225g) from drug x. The burette titration begins with the number 3 and ends with the number 11.</p>
+                                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 space-y-2 text-sm md:text-base">
+                                        <p class="text-emerald-400 font-medium">Answer: <span class="text-slate-300 font-normal">3.6%.</span></p>
+                                        <div class="text-indigo-400 font-medium math-box">Explanation: 
+                                            <ol class="list-decimal list-inside text-slate-400 font-normal mt-1 space-y-1 ml-1">
+                                                <li>Find the volume of NaOH used: $11\\text{ ml} - 3\\text{ ml} = 8\\text{ ml}$.</li>
+                                                <li>Find the chemical factor: If $5\\text{ ml} = 0.225\\text{ g}$, then $1\\text{ ml} = 0.225 / 5 = 0.045\\text{ g/ml}$.</li>
+                                                <li>Calculate the grams: $8\\text{ ml} \\times 0.045\\text{ g/ml} = 0.36\\text{ g}$.</li>
+                                                <li>Calculate the percentage: $\\frac{0.36\\text{ g}}{10\\text{ ml}} = \\frac{X}{100\\text{ ml}}$, resulting in $3.6\\%$. (Note: "final volume 30ml" is distractor information; titrations use the 10 ml filtrate).</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 2 -->
+                        <div class="glass-panel rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+                            <div class="bg-slate-800/80 px-5 py-4 border-b border-slate-700">
+                                <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-layer-group text-purple-400"></i> Group 2</h2>
+                            </div>
+                            <div class="p-5 md:p-6 space-y-6">
+                                <div>
+                                    <p class="font-semibold text-slate-200 mb-2 text-sm md:text-base leading-snug"><span class="text-purple-400 mr-2">Q4/</span>Calculate the percentage of drug x g in final volume 30ml, if you know every 5ml from NaOH equal (2.7g) from drug x. The burette titration begins with the number 7 and ends with the number 16.</p>
+                                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 space-y-2 text-sm md:text-base">
+                                        <p class="text-emerald-400 font-medium">Answer: <span class="text-slate-300 font-normal">48.6%.</span></p>
+                                        <div class="text-indigo-400 font-medium math-box">Explanation: 
+                                            <ol class="list-decimal list-inside text-slate-400 font-normal mt-1 space-y-1 ml-1">
+                                                <li>Find the volume of NaOH used: $16\\text{ ml} - 7\\text{ ml} = 9\\text{ ml}$.</li>
+                                                <li>Find the chemical factor: If $5\\text{ ml} = 2.7\\text{ g}$, then $1\\text{ ml} = 2.7 / 5 = 0.54\\text{ g/ml}$.</li>
+                                                <li>Calculate the grams dissolved: $9\\text{ ml} \\times 0.54\\text{ g/ml} = 4.86\\text{ g}$ in the 10 ml filtrate.</li>
+                                                <li>Calculate the percentage: $\\frac{4.86\\text{ g}}{10\\text{ ml}} = \\frac{X}{100\\text{ ml}}$, resulting in $48.6\\%$.</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 3 -->
+                        <div class="glass-panel rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+                            <div class="bg-slate-800/80 px-5 py-4 border-b border-slate-700">
+                                <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-layer-group text-teal-400"></i> Group 3</h2>
+                            </div>
+                            <div class="p-5 md:p-6 space-y-6">
+                                <div>
+                                    <p class="font-semibold text-slate-200 mb-2 text-sm md:text-base leading-snug"><span class="text-teal-400 mr-2">Q4/</span>Calculate % ethanol in the final mixture & salicylic acid express solubility in 1 part if 8ml ethanol (75%) is able to solubilize 14ml of 0.2gm salicylic acid.</p>
+                                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 space-y-2 text-sm md:text-base">
+                                        <p class="text-emerald-400 font-medium">Answer: <span class="text-slate-300 font-normal">27.27% ethanol; 1 part soluble in 110 parts.</span></p>
+                                        <div class="text-indigo-400 font-medium math-box">Explanation: 
+                                            <ol class="list-decimal list-inside text-slate-400 font-normal mt-1 space-y-1 ml-1">
+                                                <li>Calculate % Ethanol: Using $C_1 \\times V_1 = C_2 \\times V_2$.<br>
+                                                $75\\% \\times 8\\text{ ml} = C_2 \\times (8\\text{ ml} + 14\\text{ ml})$<br>
+                                                $600 = C_2 \\times 22 \\Rightarrow C_2 = 27.27\\%$
+                                                </li>
+                                                <li class="pt-2">Calculate Solubility Expression: Ratio of drug weight to final volume.<br>
+                                                $\\frac{0.2\\text{ g}}{22\\text{ ml}} = \\frac{1\\text{ part}}{X}$<br>
+                                                $0.2 \\times X = 22 \\Rightarrow X = 110$<br>
+                                                1 part of salicylic acid is soluble in 110 parts of a 27.27% hydro-alcoholic solution.
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Group 4 -->
+                        <div class="glass-panel rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+                            <div class="bg-slate-800/80 px-5 py-4 border-b border-slate-700">
+                                <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-layer-group text-orange-400"></i> Group 4</h2>
+                            </div>
+                            <div class="p-5 md:p-6 space-y-6">
+                                <div>
+                                    <p class="font-semibold text-slate-200 mb-2 text-sm md:text-base leading-snug"><span class="text-orange-400 mr-2">Q4/</span>Calculate % ethanol in the final mixture & salicylic acid express solubility in 1 part if 12ml ethanol (98.9%) is able to solubilize 17ml of 0.5gm salicylic acid.</p>
+                                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 space-y-2 text-sm md:text-base">
+                                        <p class="text-emerald-400 font-medium">Answer: <span class="text-slate-300 font-normal">40.92% ethanol; 1 part soluble in 58 parts.</span></p>
+                                        <div class="text-indigo-400 font-medium math-box">Explanation: 
+                                            <ol class="list-decimal list-inside text-slate-400 font-normal mt-1 space-y-1 ml-1">
+                                                <li>Calculate % Ethanol: Using $C_1 \\times V_1 = C_2 \\times V_2$.<br>
+                                                $98.9\\% \\times 12\\text{ ml} = C_2 \\times (12\\text{ ml} + 17\\text{ ml})$<br>
+                                                $1186.8 = C_2 \\times 29 \\Rightarrow C_2 = 40.92\\%$
+                                                </li>
+                                                <li class="pt-2">Calculate Solubility Expression:<br>
+                                                $\\frac{0.5\\text{ g}}{29\\text{ ml}} = \\frac{1\\text{ part}}{X}$<br>
+                                                $0.5 \\times X = 29 \\Rightarrow X = 58$<br>
+                                                1 part of salicylic acid is soluble in 58 parts of a 40.92% hydro-alcoholic solution.
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>`;
+                },
+
                 solubility() {
                     const s = app.state.solubility;
                     const totalVol = s.water + s.alcohol;
@@ -588,6 +720,7 @@
                                             <span id="naoh-volume-text" class="font-mono text-sm md:text-xl font-bold text-purple-400 bg-purple-900/30 px-2 py-1 md:px-3 rounded border border-purple-800">${s.naohAdded.toFixed(1)} ml NaOH</span>
                                         </div>
                                         
+                                        <!-- Clean DOM events block re-renders while holding mouse -->
                                         <button 
                                             onmousedown="app.logic.aspirin.startTitrate()" 
                                             onmouseup="app.logic.aspirin.stopTitrate()"
@@ -615,6 +748,115 @@
                                         <div class="mt-2 md:mt-3 text-[9px] md:text-[11px] text-slate-400 bg-slate-800 p-2 rounded leading-tight border border-slate-700">
                                             <span class="text-rose-400 font-bold">Curve Drop Analysis:</span> At 3g TSC, excess dissociates into citrate and sodium ions. Common ion effect and buffering interference cause premature titration endpoint, lowering apparent solubility artificially.
                                         </div>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                },
+
+                micellar() {
+                    const s = app.state.micellar;
+                    const flasks = [0, 0.05, 0.5, 1, 5];
+                    
+                    return `
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+                        <div class="lg:col-span-4 space-y-4">
+                            <div class="glass-panel p-5 md:p-6 rounded-2xl border border-slate-700 h-full flex flex-col">
+                                <h3 class="font-bold text-lg md:text-xl mb-4 text-white border-b border-slate-700 pb-2 md:pb-3 flex items-center"><i class="fa-solid fa-soap text-teal-400 mr-2 md:mr-3"></i>Procedure Setup</h3>
+                                <div class="text-xs md:text-sm text-slate-300 space-y-3 mb-6 flex-1">
+                                    <p>Surfactants like Tween 60 increase the solubility of poorly soluble drugs (Salicylic Acid) by incorporating them into micelles after reaching the Critical Micelle Concentration (CMC).</p>
+                                    <div class="bg-teal-900/20 border border-teal-800 p-3 rounded-lg text-teal-200">
+                                        <strong>Task:</strong> Select a flask with 25ml Tween 60 + 0.25g Salicylic Acid. Titrate 10ml of the filtrate with 0.05N NaOH using Phenol Red.
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2 md:gap-3 mt-auto">
+                                    ${flasks.map(conc => {
+                                        const tested = s.data.find(d => d.conc === conc);
+                                        const isActive = s.activeFlask === conc;
+                                        return `
+                                        <button onclick="app.logic.micellar.selectFlask(${conc})" class="p-2 md:p-3 border rounded-xl flex flex-col items-center justify-center gap-1 md:gap-2 transition-all relative overflow-hidden ${isActive ? 'bg-teal-600 border-teal-400 shadow-[0_0_15px_rgba(20,184,166,0.4)] text-white' : (tested ? 'bg-slate-800 border-emerald-500/50 text-emerald-400' : 'bg-slate-900 border-slate-700 hover:border-teal-500 text-slate-400')}">
+                                            ${tested ? '<div class="absolute top-1 right-2 text-emerald-400 text-[10px] md:text-xs"><i class="fa-solid fa-check"></i></div>' : ''}
+                                            <i class="fa-solid fa-flask text-xl md:text-2xl mb-1 ${isActive ? 'text-white' : (tested ? 'text-emerald-500' : 'text-slate-500')}"></i>
+                                            <div class="text-[10px] md:text-xs font-bold text-center leading-tight">Tween 60<br><span class="${isActive?'text-teal-200':'text-teal-400'}">${conc}%</span></div>
+                                        </button>`
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-8 glass-panel rounded-2xl shadow-xl border border-slate-700 flex flex-col relative overflow-hidden min-h-[500px]">
+                            ${s.activeFlask === null ? `
+                                <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-slate-900/80 z-10 backdrop-blur-sm p-6 text-center">
+                                    <i class="fa-solid fa-hand-pointer text-3xl md:text-4xl mb-4 text-teal-500/50 animate-bounce"></i>
+                                    <p class="text-base md:text-lg font-medium">Select a surfactant concentration to titrate.</p>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="flex-1 flex flex-col md:flex-row p-4 md:p-6 gap-6 md:gap-8">
+                                <div class="w-full md:w-1/2 flex flex-col items-center justify-center relative md:border-r border-b md:border-b-0 border-slate-700 pb-6 md:pb-0 md:pr-8 min-h-[300px]">
+                                    <!-- 25ml Burette for Lab 3 -->
+                                    <div class="absolute top-0 md:top-4 w-8 md:w-10 h-48 md:h-64 border-x-2 border-b-2 border-slate-400 bg-white/5 rounded-b z-10 flex flex-col justify-end overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-full h-full flex flex-col justify-between py-2 text-[6px] md:text-[8px] text-slate-500 font-mono text-right pr-1">
+                                            <span>0</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span>
+                                        </div>
+                                        <div id="burette-liquid-micellar" class="w-full bg-slate-200/40 liquid-fill" style="height: ${100 - (s.naohAdded * 4)}%;"></div>
+                                        <div id="titration-drop-micellar" class="absolute -bottom-6 md:-bottom-10 left-1/2 -ml-1 w-1.5 md:w-2 h-2.5 md:h-3 bg-slate-200 rounded-full anim-drop" style="display: ${s.titrating ? 'block' : 'none'};"></div>
+                                    </div>
+                                    <div class="absolute top-[185px] md:top-[260px] w-12 md:w-14 h-2 md:h-3 bg-slate-600 rounded z-20 shadow-lg"></div>
+                                    <div class="absolute top-[190px] md:top-[265px] w-2 md:w-3 h-4 md:h-6 bg-slate-500 z-10"></div>
+
+                                    <div class="relative w-32 h-40 md:w-40 md:h-48 mt-48 md:mt-56 z-0">
+                                        <!-- Phenol Red Indicator: Yellow -> Pink -->
+                                        ${app.getFlaskSVG(s.endpoint === 1 ? "rgba(236, 72, 153, 0.6)" : "rgba(250, 204, 21, 0.4)", 70, `
+                                            <div class="absolute bottom-2 left-1/2 -ml-3 md:-ml-4 w-6 md:w-8 h-1.5 md:h-2 bg-white rounded-full anim-stir opacity-80 shadow-lg"></div>
+                                        `)}
+                                    </div>
+                                </div>
+
+                                <div class="w-full md:w-1/2 flex flex-col">
+                                    <div class="bg-slate-900 border border-slate-700 p-4 md:p-5 rounded-xl mb-4">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <span class="text-[10px] md:text-sm font-bold text-slate-400 uppercase tracking-widest">0.05N NaOH Titration</span>
+                                            <span id="naoh-volume-text-micellar" class="font-mono text-sm md:text-xl font-bold text-teal-400 bg-teal-900/30 px-2 py-1 md:px-3 rounded border border-teal-800">${s.naohAdded.toFixed(1)} ml</span>
+                                        </div>
+                                        
+                                        <button 
+                                            onmousedown="app.logic.micellar.startTitrate()" 
+                                            onmouseup="app.logic.micellar.stopTitrate()"
+                                            onmouseleave="app.logic.micellar.stopTitrate()"
+                                            ontouchstart="app.logic.micellar.startTitrate()"
+                                            ontouchend="app.logic.micellar.stopTitrate()"
+                                            class="w-full py-3 md:py-4 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-teal-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 md:gap-3 text-sm md:text-base ${s.endpoint === 1 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}">
+                                            <i class="fa-solid fa-droplet"></i> HOLD TO ADD NaOH
+                                        </button>
+
+                                        ${s.endpoint === 1 ? `
+                                            <div class="mt-3 md:mt-4 p-2 md:p-3 bg-pink-900/30 border border-pink-500/50 text-pink-400 rounded-lg text-center font-bold text-xs md:text-sm scale-in">
+                                                Phenol Red Endpoint Reached!<br>
+                                                <span class="text-white font-mono mt-1 block">${(s.naohAdded * 0.0069 * 10).toFixed(3)}% S.A. Solubilized</span>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+
+                                    <div class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 md:p-4 flex flex-col">
+                                        <div class="flex justify-between items-center mb-2 border-b border-slate-800 pb-2">
+                                            <h4 class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">Micellar Solubilization Curve</h4>
+                                            <button onclick="app.logic.micellar.showMath()" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 transition-colors"><i class="fa-solid fa-calculator"></i> Math</button>
+                                        </div>
+                                        <div class="flex-1 relative min-h-[120px] md:min-h-[150px]">
+                                            <canvas id="labChart"></canvas>
+                                            
+                                            <!-- Math Overlay hidden by default -->
+                                            <div id="micellar-math" class="absolute inset-0 bg-slate-900/95 backdrop-blur z-10 hidden flex-col justify-center p-3 rounded text-[10px] md:text-xs text-slate-300 space-y-2 border border-slate-700 fade-in">
+                                                <div class="flex justify-between font-bold text-white border-b border-slate-700 pb-1 mb-1"><span>Calculations</span> <button onclick="document.getElementById('micellar-math').classList.add('hidden')"><i class="fa-solid fa-xmark"></i></button></div>
+                                                <p>$\\text{1ml of 0.05N NaOH} \\equiv \\mathbf{0.0069g \\text{ S.A.}}$</p>
+                                                <p>$\\text{g S.A. in 10ml} = \\text{Endpoint (ml)} \\times 0.0069$</p>
+                                                <p>$\\text{Total Solubility } (\\%) = \\left(\\frac{\\text{g S.A. in 10ml}}{10}\\right) \\times 100$</p>
+                                                <p class="text-center mt-2 text-teal-400 font-bold bg-teal-900/20 p-1 rounded border border-teal-800">Total Sol % = g S.A. in 10ml $\\times 10$</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -894,21 +1136,27 @@
                                         <!-- Fluid Mask Group -->
                                         <g clip-path="url(#visc-fluid-clip)">
                                             <!-- Bottom U-Turn (always full) -->
-                                            <rect x="200" y="600" width="250" height="200" fill="rgba(6, 182, 212, 0.8)" />
+                                            <rect x="200" y="600" width="250" height="200" fill="rgba(245, 158, 11, 0.8)" />
                                             
-                                            <!-- Left Measuring Bulb (Drains dynamically) -->
-                                            <rect id="visc-left-fluid" x="185" y="${isMeasuring ? '590' : (s.data.find(d=>d.c==s.conc) ? '590' : '360')}" width="100" height="400" fill="rgba(6, 182, 212, 0.8)" style="transition: y ${isMeasuring ? '2.5s' : '0.5s'} linear;" />
+                                            <!-- Left Measuring Bulb (Fluid physically flows exactly between Marks A to B using flow time) -->
+                                            <rect id="visc-left-fluid" x="185" y="${isMeasuring ? '570' : (s.data.find(d=>d.c==s.conc) ? '570' : '385')}" width="100" height="300" fill="rgba(245, 158, 11, 0.8)" style="transition: y ${isMeasuring ? app.constants.viscosityData[s.conc].time : 0.5}s linear;" />
                                             
-                                            <!-- Right Reservoir Bulb (Rises dynamically) -->
-                                            <rect id="visc-right-fluid" x="300" y="${isMeasuring ? '450' : (s.data.find(d=>d.c==s.conc) ? '450' : '550')}" width="150" height="400" fill="rgba(6, 182, 212, 0.8)" style="transition: y ${isMeasuring ? '2.5s' : '0.5s'} linear;" />
+                                            <!-- Right Reservoir Bulb (Fluid rises simultaneously) -->
+                                            <rect id="visc-right-fluid" x="300" y="${isMeasuring ? '450' : (s.data.find(d=>d.c==s.conc) ? '450' : '580')}" width="150" height="300" fill="rgba(245, 158, 11, 0.8)" style="transition: y ${isMeasuring ? app.constants.viscosityData[s.conc].time : 0.5}s linear;" />
                                         </g>
 
                                         <!-- Red Calibration Marks -->
-                                        <line x1="190" y1="385" x2="280" y2="385" stroke="#ef4444" stroke-width="5" opacity="0.9" />
-                                        <line x1="190" y1="570" x2="280" y2="570" stroke="#ef4444" stroke-width="5" opacity="0.9" />
+                                        <g stroke="#ef4444" stroke-width="4" opacity="0.9">
+                                            <line x1="170" y1="385" x2="280" y2="385" />
+                                            <line x1="170" y1="570" x2="280" y2="570" />
+                                            <line x1="190" y1="375" x2="190" y2="395" />
+                                            <line x1="260" y1="375" x2="260" y2="395" />
+                                            <line x1="190" y1="560" x2="190" y2="580" />
+                                            <line x1="260" y1="560" x2="260" y2="580" />
+                                        </g>
                                         
-                                        <text x="145" y="400" fill="#ef4444" font-size="32px" font-family="sans-serif" font-weight="bold">a</text>
-                                        <text x="145" y="585" fill="#ef4444" font-size="32px" font-family="sans-serif" font-weight="bold">b</text>
+                                        <text x="140" y="392" fill="#ef4444" font-size="28px" font-family="sans-serif" font-weight="bold">a</text>
+                                        <text x="140" y="577" fill="#ef4444" font-size="28px" font-family="sans-serif" font-weight="bold">b</text>
                                     </svg>
                                 </div>
                             </div>
@@ -1048,6 +1296,95 @@
                                 scales: {
                                     y: { beginAtZero: true, max: 100, title: { display: true, text: '% Dissolved', color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } },
                                     x: { title: { display: true, text: 'Tri-sodium Citrate (g)', color: '#cbd5e1' }, grid: { display: false }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } }
+                                }
+                            }
+                        });
+                    }
+                },
+
+                micellar: {
+                    selectFlask(conc) {
+                        app.state.micellar.activeFlask = conc;
+                        app.state.micellar.naohAdded = 0;
+                        app.state.micellar.endpoint = 0;
+                        app.renderLab();
+                    },
+                    titrationInterval: null,
+                    startTitrate() {
+                        const s = app.state.micellar;
+                        if(s.activeFlask === null || s.endpoint === 1) return;
+                        
+                        s.titrating = true;
+                        
+                        const dropAnim = document.getElementById('titration-drop-micellar');
+                        if (dropAnim) dropAnim.style.display = 'block';
+                        
+                        const target = app.constants.micellarTitration[s.activeFlask].expectedNaoh;
+                        
+                        this.titrationInterval = setInterval(() => {
+                            s.naohAdded += 0.2; 
+                            if(s.naohAdded >= target) {
+                                this.stopTitrate();
+                                s.naohAdded = target;
+                                s.endpoint = 1;
+                                
+                                if(!s.data.find(d => d.conc === s.activeFlask)) {
+                                    const gPer10ml = target * 0.0069;
+                                    const totalSolubility = gPer10ml * 10;
+                                    s.data.push({ 
+                                        conc: s.activeFlask, 
+                                        solubility: totalSolubility 
+                                    });
+                                    s.data.sort((a, b) => a.conc - b.conc);
+                                }
+                                app.renderLab(); 
+                            } else {
+                                const numEl = document.getElementById('naoh-volume-text-micellar');
+                                if(numEl) numEl.innerText = `${s.naohAdded.toFixed(1)} ml`;
+                                const liqEl = document.getElementById('burette-liquid-micellar');
+                                if(liqEl) liqEl.style.height = `${100 - (s.naohAdded * 4)}%`; 
+                            }
+                        }, 40);
+                    },
+                    stopTitrate() {
+                        app.state.micellar.titrating = false;
+                        if(this.titrationInterval) clearInterval(this.titrationInterval);
+                        
+                        const dropAnim = document.getElementById('titration-drop-micellar');
+                        if(dropAnim) dropAnim.style.display = 'none';
+                    },
+                    showMath() {
+                        const m = document.getElementById('micellar-math');
+                        if(m) m.classList.remove('hidden');
+                    },
+                    drawChart() {
+                        const data = app.state.micellar.data;
+                        if(data.length === 0) return;
+
+                        Chart.defaults.color = '#94a3b8';
+                        Chart.defaults.font.family = 'Segoe UI';
+
+                        const ctx = document.getElementById('labChart').getContext('2d');
+                        
+                        const chartData = data.map(d => ({x: d.conc, y: d.solubility}));
+
+                        app.chartInstance = new Chart(ctx, {
+                            type: 'scatter',
+                            data: {
+                                datasets: [{
+                                    label: 'S.A. Total Solubility (%)',
+                                    data: chartData,
+                                    borderColor: '#14b8a6', backgroundColor: 'rgba(20, 184, 166, 0.2)',
+                                    borderWidth: 3, pointBackgroundColor: '#5eead4', pointRadius: window.innerWidth < 768 ? 4 : 6, pointBorderColor: '#14b8a6', pointBorderWidth: 2,
+                                    showLine: true, tension: 0.2
+                                }]
+                            },
+                            options: {
+                                responsive: true, maintainAspectRatio: false,
+                                plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', bodyColor: '#5eead4', borderColor: '#0d9488', borderWidth: 1, callbacks: { label: (ctx) => `Conc: ${ctx.raw.x}% | Sol: ${ctx.raw.y.toFixed(3)}%` } } },
+                                scales: {
+                                    y: { beginAtZero: true, title: { display: true, text: 'S.A. Solubility (% w/v)', color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } },
+                                    x: { type: 'linear', title: { display: true, text: 'Surfactant Concentration (%)', color: '#cbd5e1' }, grid: { display: false }, ticks: { font: { size: window.innerWidth < 768 ? 10 : 12 } } }
                                 }
                             }
                         });
@@ -1211,11 +1548,11 @@
                         const s = app.state.viscosity;
                         s.measuring = true;
                         const cData = app.constants.viscosityData[s.conc];
-                        const targetTime = cData.time;
+                        const targetTime = cData.time; 
                         s.flowTimer = 0;
                         app.renderLab();
 
-                        const realTimeMs = 2500; 
+                        const realTimeMs = targetTime * 1000; 
                         const start = Date.now();
 
                         const interval = setInterval(() => {
@@ -1298,7 +1635,7 @@
                 const questions = [
                     { q: "Why is the absorption of aspirin in the intestine greater than in the stomach?", a: "The intestine offers a larger surface area and its pH is more favorable to aspirin absorption (slightly alkaline media).", opts: ["Because the stomach breaks it down immediately.", "The intestine offers a larger surface area and its pH is more favorable to aspirin absorption.", "Because aspirin is completely insoluble in stomach acid.", "It is actively transported only in the intestine."] },
                     { q: "What happens when tri-sodium citrate is applied above the amount required to dissolve aspirin?", a: "Excess dissociates into citrate and sodium ions, forming NaOH which causes the endpoint to be reached artificially faster.", opts: ["Solubility continues to increase indefinitely.", "The solution freezes.", "Excess dissociates into ions, buffering interference causes the endpoint to be reached faster artificially.", "The aspirin precipitates completely into a solid block."] },
-                    { q: "According to USP, if we dissolve 1 part of solute in 82 parts of solvent, how is it described?", a: "Sparingly soluble (30-100 parts)", opts: ["Very soluble", "Freely soluble", "Sparingly soluble", "Slightly soluble"] },
+                    { q: "What happens to the number of micelles when we add surfactant above the Critical Micelle Concentration (CMC)?", a: "The number of micelles increases.", opts: ["The number of micelles decreases.", "Micelles begin to break down into monomers.", "The number of micelles increases.", "The surface tension begins to increase again."] },
                     { q: "In the Surface Tension lab, what does the critical micelle concentration (CMC) indicate?", a: "The point where the surface is fully saturated and molecules begin forming micelles in the bulk liquid.", opts: ["The liquid evaporates.", "The surface is fully saturated and molecules form micelles in the bulk.", "The solvent turns into a solid.", "The point where surface tension reaches its absolute maximum."] },
                     { q: "How do we find the intrinsic viscosity from the reduced viscosity graph?", a: "By extrapolating the line to infinite dilution (Y-axis intercept where concentration = 0).", opts: ["By taking the highest value on the curve.", "By extrapolating the line to infinite dilution (Y-intercept where C=0).", "By calculating the area under the curve.", "By multiplying the slope by 100."] }
                 ];
